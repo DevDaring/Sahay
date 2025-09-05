@@ -42,8 +42,8 @@ Tech Stack:
 - CSV-based data system
 - Privacy-preserving analytics"
 
-# Push to GitHub (creates main branch)
-git push -u origin main
+# Push to GitHub (creates master branch)
+git push -u origin master
 ```
 
 ---
@@ -64,7 +64,7 @@ rmdir temp_sahay /S /Q
 git remote add origin https://github.com/DevDaring/Sahay.git
 
 # Pull any existing changes
-git pull origin main --allow-unrelated-histories
+git pull origin master --allow-unrelated-histories
 
 # Add your new changes
 git add .
@@ -93,7 +93,7 @@ git commit -m "🌍 Multi-Language AI Platform - Hackathon Ready
 - Production scalable"
 
 # Push to GitHub
-git push origin main
+git push origin master
 ```
 
 ---

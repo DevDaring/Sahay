@@ -271,7 +271,7 @@ Features:
 - Complete documentation"
 
 # Push to GitHub
-git push -u origin main
+git push -u origin master
 ```
 
 ### **Alternative: Push to New Branch**
@@ -290,14 +290,14 @@ git push -u origin hackathon-submission
 ### **Update Existing Repository**
 ```bash
 # If repository already exists, pull latest changes first
-git pull origin main
+git pull origin master
 
 # Add your changes
 git add .
 git commit -m "🌍 Multi-Language AI Platform Complete Implementation"
 
 # Push updates
-git push origin main
+git push origin master
 ```
 
 ---
