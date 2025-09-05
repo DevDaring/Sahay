@@ -1,0 +1,42 @@
+course_id,topic,difficulty_level,prerequisites
+CS101,Introduction to Programming,1,[]
+CS102,Data Structures and Algorithms,2,"[""CS101""]"
+CS201,Object-Oriented Programming,2,"[""CS101""]"
+CS202,Database Systems,3,"[""CS101"", ""CS102""]"
+CS301,Software Engineering,3,"[""CS201"", ""CS102""]"
+CS302,Computer Networks,3,"[""CS101"", ""CS102""]"
+CS401,Machine Learning,4,"[""CS102"", ""MATH201"", ""STAT101""]"
+CS402,Cybersecurity,4,"[""CS302"", ""CS202""]"
+CS501,Advanced AI,5,"[""CS401"", ""CS301""]"
+MATH101,Calculus I,2,[]
+MATH102,Calculus II,3,"[""MATH101""]"
+MATH201,Linear Algebra,3,"[""MATH101""]"
+MATH301,Discrete Mathematics,3,"[""MATH101""]"
+STAT101,Statistics and Probability,2,"[""MATH101""]"
+STAT201,Advanced Statistics,3,"[""STAT101"", ""MATH201""]"
+PHYS101,Physics I,2,"[""MATH101""]"
+PHYS102,Physics II,3,"[""PHYS101"", ""MATH102""]"
+CHEM101,General Chemistry,2,[]
+CHEM201,Organic Chemistry,3,"[""CHEM101""]"
+BIO101,General Biology,1,[]
+BIO201,Molecular Biology,3,"[""BIO101"", ""CHEM101""]"
+ENG101,English Composition,1,[]
+ENG201,Technical Writing,2,"[""ENG101""]"
+PSYC101,Introduction to Psychology,1,[]
+PSYC201,Cognitive Psychology,2,"[""PSYC101""]"
+PSYC301,Mental Health and Wellness,3,"[""PSYC101"", ""PSYC201""]"
+ECON101,Microeconomics,2,[]
+ECON201,Macroeconomics,2,"[""ECON101""]"
+BUSI101,Business Fundamentals,1,[]
+BUSI201,Marketing Principles,2,"[""BUSI101""]"
+BUSI301,Entrepreneurship,3,"[""BUSI101"", ""ECON101""]"
+ART101,Digital Art Fundamentals,1,[]
+ART201,Advanced Digital Design,2,"[""ART101""]"
+MUS101,Music Theory,1,[]
+MUS201,Music Composition,2,"[""MUS101""]"
+HIST101,World History,1,[]
+PHIL101,Introduction to Philosophy,1,[]
+LANG101,Hindi Language Basics,1,[]
+LANG201,Bengali Language Basics,1,[]
+LANG301,Advanced Language Studies,2,"[""LANG101""]"
+ENV101,Environmental Science,2,[]

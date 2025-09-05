@@ -1,0 +1,689 @@
+# ============================================
+# cloudbuild.yaml - Google Cloud Build Configuration
+# ============================================
+
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/sahay-app:$COMMIT_SHA', '.']
+  
+  # Push the Docker image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/sahay-app:$COMMIT_SHA']
+  
+  # Run database migrations
+  - name: 'gcr.io/google-appengine/exec-wrapper'
+    args:
+      - '-i'
+      - 'gcr.io/$PROJECT_ID/sahay-app:$COMMIT_SHA'
+      - '-s'
+      - '$PROJECT_ID:$_REGION:sahay-db'
+      - '--'
+      - 'python'
+      - 'manage.py'
+      - 'migrate'
+    env:
+      - 'DATABASE_URL=${_DATABASE_URL}'
+  
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'sahay-app'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/sahay-app:$COMMIT_SHA'
+      - '--region'
+      - '$_REGION'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'DATABASE_URL=${_DATABASE_URL},GCP_PROJECT_ID=$PROJECT_ID,VERTEX_AI_MODEL=${_VERTEX_AI_MODEL}'
+      - '--set-secrets'
+      - 'SECRET_KEY=sahay-secret-key:latest'
+      - '--service-account'
+      - 'sahay-service@$PROJECT_ID.iam.gserviceaccount.com'
+      - '--memory'
+      - '2Gi'
+      - '--cpu'
+      - '2'
+      - '--timeout'
+      - '300'
+      - '--concurrency'
+      - '100'
+      - '--max-instances'
+      - '10'
+
+substitutions:
+  _REGION: us-central1
+  _DATABASE_URL: postgresql://sahay_user:password@/sahay_db?host=/cloudsql/PROJECT_ID:REGION:sahay-db
+  _VERTEX_AI_MODEL: gemini-1.5-flash
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'
+
+# ============================================
+# k8s-deployment.yaml - Kubernetes Deployment
+# ============================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sahay
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sahay-config
+  namespace: sahay
+data:
+  DEBUG: "False"
+  GCP_PROJECT_ID: "sahay-hackathon-2024"
+  GCP_LOCATION: "us-central1"
+  VERTEX_AI_MODEL: "gemini-1.5-flash"
+  K_ANONYMITY_THRESHOLD: "5"
+  DATA_RETENTION_DAYS: "90"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sahay-secrets
+  namespace: sahay
+type: Opaque
+stringData:
+  SECRET_KEY: "your-django-secret-key"
+  DATABASE_URL: "postgresql://sahay_user:password@postgres-service:5432/sahay_db"
+  REDIS_URL: "redis://redis-service:6379/0"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sahay-web
+  namespace: sahay
+  labels:
+    app: sahay-web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sahay-web
+  template:
+    metadata:
+      labels:
+        app: sahay-web
+    spec:
+      serviceAccountName: sahay-ksa
+      containers:
+      - name: sahay-app
+        image: gcr.io/sahay-hackathon-2024/sahay-app:latest
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: sahay-config
+        - secretRef:
+            name: sahay-secrets
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "2000m"
+            memory: "2Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: media-storage
+          mountPath: /app/media
+        - name: static-storage
+          mountPath: /app/static
+      volumes:
+      - name: media-storage
+        persistentVolumeClaim:
+          claimName: media-pvc
+      - name: static-storage
+        persistentVolumeClaim:
+          claimName: static-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sahay-service
+  namespace: sahay
+spec:
+  selector:
+    app: sahay-web
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: sahay
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: sahay_db
+        - name: POSTGRES_USER
+          value: sahay_user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: sahay
+spec:
+  selector:
+    app: postgres
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: sahay
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+        - name: redis-storage
+          mountPath: /data
+      volumes:
+      - name: redis-storage
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: sahay
+spec:
+  selector:
+    app: redis
+  ports:
+  - protocol: TCP
+    port: 6379
+    targetPort: 6379
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: sahay
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard-rwo
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media-pvc
+  namespace: sahay
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: standard
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: static-pvc
+  namespace: sahay
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: standard
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sahay-cleanup
+  namespace: sahay
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: cleanup
+            image: gcr.io/sahay-hackathon-2024/sahay-app:latest
+            command:
+            - python
+            - manage.py
+            - cleanup_old_data
+            envFrom:
+            - configMapRef:
+                name: sahay-config
+            - secretRef:
+                name: sahay-secrets
+          restartPolicy: OnFailure
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: sahay-hpa
+  namespace: sahay
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: sahay-web
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+# ============================================
+# terraform/main.tf - Infrastructure as Code
+# ============================================
+
+terraform {
+  required_version = ">= 1.0"
+  
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 5.0"
+    }
+  }
+  
+  backend "gcs" {
+    bucket = "sahay-terraform-state"
+    prefix = "terraform/state"
+  }
+}
+
+provider "google" {
+  project = var.project_id
+  region  = var.region
+}
+
+# Variables
+variable "project_id" {
+  description = "GCP Project ID"
+  type        = string
+  default     = "sahay-hackathon-2024"
+}
+
+variable "region" {
+  description = "GCP Region"
+  type        = string
+  default     = "us-central1"
+}
+
+variable "zone" {
+  description = "GCP Zone"
+  type        = string
+  default     = "us-central1-a"
+}
+
+# Enable Required APIs
+resource "google_project_service" "apis" {
+  for_each = toset([
+    "run.googleapis.com",
+    "cloudbuild.googleapis.com",
+    "containerregistry.googleapis.com",
+    "sqladmin.googleapis.com",
+    "compute.googleapis.com",
+    "servicenetworking.googleapis.com",
+    "aiplatform.googleapis.com",
+    "secretmanager.googleapis.com",
+  ])
+  
+  service = each.key
+  disable_on_destroy = false
+}
+
+# Service Account
+resource "google_service_account" "sahay_service" {
+  account_id   = "sahay-service"
+  display_name = "Sahay Service Account"
+  description  = "Service account for Sahay application"
+}
+
+# IAM Roles
+resource "google_project_iam_member" "sahay_roles" {
+  for_each = toset([
+    "roles/aiplatform.user",
+    "roles/storage.admin",
+    "roles/cloudsql.client",
+    "roles/secretmanager.secretAccessor",
+    "roles/logging.logWriter",
+    "roles/monitoring.metricWriter",
+  ])
+  
+  project = var.project_id
+  role    = each.key
+  member  = "serviceAccount:${google_service_account.sahay_service.email}"
+}
+
+# Cloud SQL Instance
+resource "google_sql_database_instance" "sahay_db" {
+  name             = "sahay-db-instance"
+  database_version = "POSTGRES_15"
+  region           = var.region
+  
+  settings {
+    tier = "db-f1-micro"
+    
+    disk_config {
+      disk_size = 10
+      disk_type = "PD_SSD"
+    }
+    
+    backup_configuration {
+      enabled    = true
+      start_time = "03:00"
+    }
+    
+    ip_configuration {
+      ipv4_enabled    = true
+      private_network = google_compute_network.vpc.id
+      
+      authorized_networks {
+        name  = "all"
+        value = "0.0.0.0/0"
+      }
+    }
+    
+    database_flags {
+      name  = "max_connections"
+      value = "100"
+    }
+  }
+}
+
+# Database
+resource "google_sql_database" "sahay" {
+  name     = "sahay_db"
+  instance = google_sql_database_instance.sahay_db.name
+}
+
+# Database User
+resource "google_sql_user" "sahay_user" {
+  name     = "sahay_user"
+  instance = google_sql_database_instance.sahay_db.name
+  password = random_password.db_password.result
+}
+
+resource "random_password" "db_password" {
+  length  = 32
+  special = true
+}
+
+# VPC Network
+resource "google_compute_network" "vpc" {
+  name                    = "sahay-vpc"
+  auto_create_subnetworks = false
+}
+
+# Subnet
+resource "google_compute_subnetwork" "subnet" {
+  name          = "sahay-subnet"
+  ip_cidr_range = "10.0.0.0/24"
+  network       = google_compute_network.vpc.id
+  region        = var.region
+}
+
+# Cloud Storage Buckets
+resource "google_storage_bucket" "data_bucket" {
+  name     = "${var.project_id}-data"
+  location = var.region
+  
+  lifecycle_rule {
+    condition {
+      age = 90
+    }
+    action {
+      type = "Delete"
+    }
+  }
+  
+  versioning {
+    enabled = true
+  }
+}
+
+resource "google_storage_bucket" "media_bucket" {
+  name     = "${var.project_id}-media"
+  location = var.region
+  
+  cors {
+    origin          = ["*"]
+    method          = ["GET", "HEAD", "PUT", "POST", "DELETE"]
+    response_header = ["*"]
+    max_age_seconds = 3600
+  }
+}
+
+# Secret Manager
+resource "google_secret_manager_secret" "django_secret" {
+  secret_id = "sahay-secret-key"
+  
+  replication {
+    automatic = true
+  }
+}
+
+resource "google_secret_manager_secret_version" "django_secret_version" {
+  secret = google_secret_manager_secret.django_secret.id
+  secret_data = random_password.django_secret.result
+}
+
+resource "random_password" "django_secret" {
+  length  = 50
+  special = true
+}
+
+# Cloud Run Service
+resource "google_cloud_run_service" "sahay_app" {
+  name     = "sahay-app"
+  location = var.region
+  
+  template {
+    spec {
+      service_account_name = google_service_account.sahay_service.email
+      
+      containers {
+        image = "gcr.io/${var.project_id}/sahay-app:latest"
+        
+        env {
+          name  = "DATABASE_URL"
+          value = "postgresql://sahay_user:${random_password.db_password.result}@/${google_sql_database.sahay.name}?host=/cloudsql/${google_sql_database_instance.sahay_db.connection_name}"
+        }
+        
+        env {
+          name  = "GCP_PROJECT_ID"
+          value = var.project_id
+        }
+        
+        env {
+          name  = "VERTEX_AI_MODEL"
+          value = "gemini-1.5-flash"
+        }
+        
+        resources {
+          limits = {
+            cpu    = "2000m"
+            memory = "2Gi"
+          }
+        }
+      }
+    }
+    
+    metadata {
+      annotations = {
+        "autoscaling.knative.dev/maxScale"     = "100"
+        "run.googleapis.com/cloudsql-instances" = google_sql_database_instance.sahay_db.connection_name
+      }
+    }
+  }
+  
+  traffic {
+    percent         = 100
+    latest_revision = true
+  }
+  
+  depends_on = [google_project_service.apis]
+}
+
+# Cloud Run IAM
+resource "google_cloud_run_service_iam_member" "public" {
+  service  = google_cloud_run_service.sahay_app.name
+  location = google_cloud_run_service.sahay_app.location
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}
+
+# Outputs
+output "service_url" {
+  value = google_cloud_run_service.sahay_app.status[0].url
+}
+
+output "database_connection" {
+  value     = google_sql_database_instance.sahay_db.connection_name
+  sensitive = true
+}
+
+# ============================================
+# gcp-deploy.sh - GCP Deployment Script
+# ============================================
+
+#!/bin/bash
+
+set -e
+
+# Configuration
+PROJECT_ID="sahay-hackathon-2024"
+REGION="us-central1"
+SERVICE_NAME="sahay-app"
+IMAGE_NAME="gcr.io/${PROJECT_ID}/${SERVICE_NAME}"
+
+echo "🚀 Deploying Sahay to Google Cloud Platform"
+
+# Authenticate
+echo "Authenticating with GCP..."
+gcloud auth login
+gcloud config set project ${PROJECT_ID}
+
+# Enable APIs
+echo "Enabling required APIs..."
+gcloud services enable \
+    run.googleapis.com \
+    cloudbuild.googleapis.com \
+    containerregistry.googleapis.com \
+    sqladmin.googleapis.com \
+    aiplatform.googleapis.com \
+    secretmanager.googleapis.com
+
+# Build and push Docker image
+echo "Building Docker image..."
+gcloud builds submit --tag ${IMAGE_NAME}
+
+# Create secrets
+echo "Creating secrets..."
+echo -n "$(openssl rand -base64 32)" | gcloud secrets create sahay-secret-key --data-file=-
+
+# Deploy to Cloud Run
+echo "Deploying to Cloud Run..."
+gcloud run deploy ${SERVICE_NAME} \
+    --image ${IMAGE_NAME} \
+    --platform managed \
+    --region ${REGION} \
+    --allow-unauthenticated \
+    --set-env-vars="GCP_PROJECT_ID=${PROJECT_ID},VERTEX_AI_MODEL=gemini-1.5-flash" \
+    --set-secrets="SECRET_KEY=sahay-secret-key:latest" \
+    --memory 2Gi \
+    --cpu 2 \
+    --timeout 300 \
+    --concurrency 100 \
+    --max-instances 10
+
+# Get service URL
+SERVICE_URL=$(gcloud run services describe ${SERVICE_NAME} \
+    --platform managed \
+    --region ${REGION} \
+    --format 'value(status.url)')
+
+echo "✅ Deployment complete!"
+echo "Service URL: ${SERVICE_URL}"

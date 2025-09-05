@@ -1,0 +1,41 @@
+action_id,student_id,session_id,action_text,category,duration_minutes,status,due_date,completed_at
+ACT001,STU001,WS001,Take a 10-minute walk around campus to clear your mind,wellness,10,completed,2024-08-15T12:00:00Z,2024-08-15T11:45:00Z
+ACT002,STU001,WS001,Review CS101 lecture notes for 30 minutes,study,30,completed,2024-08-15T15:00:00Z,2024-08-15T14:30:00Z
+ACT003,STU001,WS001,Listen to your favorite music playlist for relaxation,interest,20,completed,2024-08-15T18:00:00Z,2024-08-15T17:40:00Z
+ACT004,STU002,WS002,Practice deep breathing exercises for 5 minutes,wellness,5,completed,2024-08-15T11:00:00Z,2024-08-15T10:55:00Z
+ACT005,STU002,WS002,Work on art project for 45 minutes,interest,45,in_progress,2024-08-15T16:00:00Z,
+ACT006,STU002,WS002,Connect with a friend for social support,social,30,pending,2024-08-15T19:00:00Z,
+ACT007,STU003,WS003,Reach out to counseling services immediately,wellness,60,completed,2024-08-15T12:00:00Z,2024-08-15T11:30:00Z
+ACT008,STU003,WS003,Take a break from studies for the rest of the day,break,480,completed,2024-08-15T12:00:00Z,2024-08-15T12:00:00Z
+ACT009,STU003,WS003,Practice mindful cooking as a calming activity,interest,60,pending,2024-08-15T18:00:00Z,
+ACT010,STU004,WS004,Continue with current study schedule,study,120,completed,2024-08-15T16:00:00Z,2024-08-15T15:30:00Z
+ACT011,STU004,WS004,Spend time on gaming to unwind,interest,60,completed,2024-08-15T20:00:00Z,2024-08-15T19:45:00Z
+ACT012,STU004,WS004,Get adequate sleep tonight,wellness,480,completed,2024-08-15T22:00:00Z,2024-08-15T22:00:00Z
+ACT013,STU005,WS005,Write in journal for 15 minutes,wellness,15,completed,2024-08-15T17:00:00Z,2024-08-15T16:45:00Z
+ACT014,STU005,WS005,Work on poetry composition,interest,45,in_progress,2024-08-15T19:00:00Z,
+ACT015,STU005,WS005,Review literature assignment,study,60,pending,2024-08-16T10:00:00Z,
+ACT016,STU006,WS006,Continue with current momentum,study,90,completed,2024-08-16T10:00:00Z,2024-08-16T09:30:00Z
+ACT017,STU006,WS006,Explore astronomy resources online,interest,30,completed,2024-08-16T14:00:00Z,2024-08-16T13:45:00Z
+ACT018,STU006,WS006,Share knowledge with study group,social,45,pending,2024-08-16T16:00:00Z,
+ACT019,STU007,WS007,Take breaks between study sessions,wellness,15,snoozed,2024-08-16T11:00:00Z,
+ACT020,STU007,WS007,Practice musical instrument,interest,45,completed,2024-08-16T15:00:00Z,2024-08-16T14:30:00Z
+ACT021,STU007,WS007,Connect with music group members,social,30,pending,2024-08-16T18:00:00Z,
+ACT022,STU008,WS008,Schedule immediate counseling session,wellness,60,completed,2024-08-16T11:00:00Z,2024-08-16T10:45:00Z
+ACT023,STU008,WS008,Take complete break from work/studies today,break,720,completed,2024-08-16T11:00:00Z,2024-08-16T11:00:00Z
+ACT024,STU008,WS008,Engage in light physical activity,wellness,30,pending,2024-08-16T17:00:00Z,
+ACT025,STU009,WS009,Continue with art practice,interest,60,completed,2024-08-16T15:00:00Z,2024-08-16T14:30:00Z
+ACT026,STU009,WS009,Take short study breaks every hour,wellness,10,in_progress,2024-08-16T17:00:00Z,
+ACT027,STU009,WS009,Complete drawing assignment,study,90,pending,2024-08-17T10:00:00Z,
+ACT028,STU010,WS010,Practice language learning for 30 minutes,interest,30,completed,2024-08-16T17:00:00Z,2024-08-16T16:45:00Z
+ACT029,STU010,WS010,Take mindful break from studies,wellness,20,completed,2024-08-16T18:00:00Z,2024-08-16T17:50:00Z
+ACT030,STU010,WS010,Plan cultural exploration activity,interest,45,pending,2024-08-16T20:00:00Z,
+ACT031,STU011,WS011,Seek immediate support from counselor,wellness,60,completed,2024-08-17T10:00:00Z,2024-08-17T09:30:00Z
+ACT032,STU011,WS011,Take rest day from academic work,break,480,completed,2024-08-17T10:00:00Z,2024-08-17T10:00:00Z
+ACT033,STU011,WS011,Engage in light debate or discussion,interest,45,pending,2024-08-17T16:00:00Z,
+ACT034,STU012,WS012,Continue yoga practice,wellness,45,completed,2024-08-17T12:00:00Z,2024-08-17T11:45:00Z
+ACT035,STU012,WS012,Maintain meditation routine,wellness,20,completed,2024-08-17T18:00:00Z,2024-08-17T17:50:00Z
+ACT036,STU012,WS012,Focus on fitness goals,interest,60,pending,2024-08-17T19:00:00Z,
+ACT037,STU013,WS013,Work on AI/ML project,interest,120,in_progress,2024-08-17T16:00:00Z,
+ACT038,STU013,WS013,Take tech learning breaks,wellness,15,completed,2024-08-17T15:00:00Z,2024-08-17T14:45:00Z
+ACT039,STU013,WS013,Connect with coding community,social,30,pending,2024-08-17T20:00:00Z,
+ACT040,STU014,WS014,Schedule counseling appointment,wellness,60,completed,2024-08-17T16:00:00Z,2024-08-17T15:30:00Z
