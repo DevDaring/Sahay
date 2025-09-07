@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Sahay{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 0;">
+    <!-- Welcome Header -->
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 style="color: var(--primary); margin-bottom: 0.5rem;">
+            Welcome back, {{ student.student_id }}! 👋
+        </h1>
+        <p style="color: var(--gray);">
+            Preferred Language: <strong>{{ student.language_pref }}</strong> | 
+            Age: {{ student.age_band }} | 
+            Interests: {{ student.interests|join:", " }}
+        </p>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="card" style="margin-bottom: 2rem; text-align: center;">
+        <h3 style="margin-bottom: 1.5rem; color: var(--primary);">Quick Actions</h3>
+        <div class="grid grid-2" style="gap: 1rem;">
+            {% for link in quick_links %}
+            <a href="{{ link.url }}" class="btn btn-outline" style="display: flex; align-items: center; justify-content: center; padding: 1rem; text-decoration: none;">
+                <span style="font-size: 1.5rem; margin-right: 0.5rem;">{{ link.icon }}</span>
+                {{ link.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Stats Overview -->
+    <div class="grid grid-3" style="margin-bottom: 2rem;">
+        <div class="card" style="text-align: center;">
+            <h3 style="color: var(--success); margin-bottom: 0.5rem;">{{ wellness_stats.avg_mood|floatformat:1 }}/10</h3>
+            <p style="color: var(--gray);">Average Mood</p>
+            <div style="background: var(--gray-light); height: 8px; border-radius: 4px; margin-top: 1rem;">
+                <div style="background: var(--success); height: 8px; border-radius: 4px; width: {{ wellness_stats.avg_mood }}0%;"></div>
+            </div>
+        </div>
+        
+        <div class="card" style="text-align: center;">
+            <h3 style="color: var(--warning); margin-bottom: 0.5rem;">{{ wellness_stats.avg_anxiety|floatformat:1 }}/10</h3>
+            <p style="color: var(--gray);">Anxiety Level</p>
+            <div style="background: var(--gray-light); height: 8px; border-radius: 4px; margin-top: 1rem;">
+                <div style="background: var(--warning); height: 8px; border-radius: 4px; width: {{ wellness_stats.avg_anxiety }}0%;"></div>
+            </div>
+        </div>
+        
+        <div class="card" style="text-align: center;">
+            <h3 style="color: var(--primary); margin-bottom: 0.5rem;">{{ wellness_stats.recent_sessions }}</h3>
+            <p style="color: var(--gray);">Check-ins This Week</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--gray);">
+                Trend: <span style="color: {% if wellness_stats.trend == 'improving' %}var(--success){% else %}var(--warning){% endif %};">{{ wellness_stats.trend|title }}</span>
+            </p>
+        </div>
+    </div>
+    
+    <div class="grid grid-2">
+        <!-- Recent Sessions -->
+        <div class="card">
+            <h3 style="color: var(--primary); margin-bottom: 1rem; display: flex; align-items: center;">
+                🧘 Recent Wellness Sessions
+            </h3>
+            
+            {% if recent_sessions %}
+                <div style="max-height: 300px; overflow-y: auto;">
+                    {% for session in recent_sessions %}
+                    <div style="padding: 1rem; border: 1px solid var(--gray-light); border-radius: 8px; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 500;">Session {{ session.session_id }}</span>
+                            <span style="color: {% if session.risk_level == 'L1' %}var(--success){% elif session.risk_level == 'L2' %}var(--warning){% else %}var(--error){% endif %}; font-weight: 500;">
+                                {{ session.risk_level }}
+                            </span>
+                        </div>
+                        <div style="display: flex; gap: 1rem; font-size: 0.9rem; color: var(--gray);">
+                            <span>Mood: {{ session.mood_score|default:"N/A" }}/10</span>
+                            <span>Anxiety: {{ session.anxiety_score|default:"N/A" }}/10</span>
+                        </div>
+                        {% if session.created_at %}
+                        <small style="color: var(--gray);">{{ session.created_at|date:"M d, Y H:i" }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="color: var(--gray); text-align: center; padding: 2rem 0;">
+                    No recent wellness sessions. <a href="{% url 'wellness:check' %}">Start your first check-in</a>
+                </p>
+            {% endif %}
+        </div>
+        
+        <!-- Pending Actions -->
+        <div class="card">
+            <h3 style="color: var(--secondary); margin-bottom: 1rem; display: flex; align-items: center;">
+                ✅ Your Personalized Actions
+            </h3>
+            
+            {% if pending_actions %}
+                <div style="max-height: 300px; overflow-y: auto;">
+                    {% for action in pending_actions %}
+                    <div style="padding: 1rem; border: 1px solid var(--gray-light); border-radius: 8px; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 500; color: var(--primary);">{{ action.category|title }}</span>
+                            <span style="background: var(--accent); color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">
+                                {{ action.duration_minutes }} min
+                            </span>
+                        </div>
+                        <p style="margin-bottom: 0.5rem;">{{ action.action_text }}</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            {% if action.due_date %}
+                            <small style="color: var(--gray);">Due: {{ action.due_date|date:"M d, H:i" }}</small>
+                            {% endif %}
+                            <button class="btn btn-secondary" onclick="startAction('{{ action.action_id }}')" style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">
+                                Start
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="color: var(--gray); text-align: center; padding: 2rem 0;">
+                    No pending actions. <a href="{% url 'wellness:check' %}">Take a wellness check</a> to get personalized recommendations.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Recent Learning -->
+    {% if recent_learning %}
+    <div class="card" style="margin-top: 2rem;">
+        <h3 style="color: var(--accent); margin-bottom: 1rem; display: flex; align-items: center;">
+            📚 Recent Learning Sessions
+        </h3>
+        
+        <div class="grid grid-3">
+            {% for session in recent_learning %}
+            <div style="padding: 1rem; border: 1px solid var(--gray-light); border-radius: 8px;">
+                <h4 style="color: var(--primary); margin-bottom: 0.5rem;">{{ session.topic }}</h4>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.9rem; color: var(--gray);">{{ session.duration_minutes }} minutes</span>
+                    {% if session.focus_score %}
+                    <span style="font-size: 0.9rem; color: var(--secondary);">Focus: {{ session.focus_score }}/10</span>
+                    {% endif %}
+                </div>
+                {% if session.comprehension_level %}
+                <span style="background: {% if session.comprehension_level == 'high' %}var(--success){% elif session.comprehension_level == 'medium' %}var(--warning){% else %}var(--error){% endif %}; color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">
+                    {{ session.comprehension_level|title }} Comprehension
+                </span>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function startAction(actionId) {
+        if (confirm('Ready to start this action?')) {
+            // Mark action as in progress
+            fetch('/api/actions/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    action_id: actionId,
+                    status: 'in_progress'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Action started! Good luck! 🎉', 'success');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Action started! Focus and do your best! 💪', 'success');
+            });
+        }
+    }
+    
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? 'var(--success)' : 'var(--primary)'};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        `;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease-out';
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 3000);
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Add animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

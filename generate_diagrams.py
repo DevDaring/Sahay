@@ -297,3 +297,4 @@ if __name__ == "__main__":
     privacy_fig.write_image("sahay_privacy_protection.png", width=700, height=500)
     
     print("All diagrams generated successfully!")
++

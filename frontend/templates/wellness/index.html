@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+
+{% block title %}Wellness Center - Sahay{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 0;">
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 style="color: var(--primary); margin-bottom: 1rem; font-size: 2.5rem;">
+            🧘 Wellness Center
+        </h1>
+        <p style="color: var(--gray); font-size: 1.1rem;">
+            Your mental health and wellbeing matter. Take a moment for yourself.
+        </p>
+    </div>
+    
+    <!-- Quick Stats -->
+    <div class="grid grid-3" style="margin-bottom: 3rem;">
+        <div class="card" style="text-align: center;">
+            <h3 style="color: var(--success); margin-bottom: 0.5rem;">{{ total_sessions }}</h3>
+            <p style="color: var(--gray);">Total Sessions</p>
+        </div>
+        <div class="card" style="text-align: center;">
+            <h3 style="color: var(--primary); margin-bottom: 0.5rem;">{{ recent_sessions }}</h3>
+            <p style="color: var(--gray);">This Week</p>
+        </div>
+        <div class="card" style="text-align: center;">
+            <h3 style="color: var(--secondary); margin-bottom: 0.5rem;">{{ avg_mood|floatformat:1 }}/10</h3>
+            <p style="color: var(--gray);">Average Mood</p>
+        </div>
+    </div>
+    
+    <!-- Main Actions -->
+    <div class="grid grid-2" style="margin-bottom: 3rem;">
+        <!-- Quick Wellness Check -->
+        <div class="card" style="text-align: center; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🌟</div>
+            <h3 style="margin-bottom: 1rem;">Quick Wellness Check</h3>
+            <p style="margin-bottom: 2rem; opacity: 0.9;">
+                Take a 2-minute private assessment to get personalized support and actions
+            </p>
+            <a href="{% url 'wellness:check' %}" class="btn" style="background: white; color: var(--primary); padding: 1rem 2rem; font-weight: 600;">
+                Start Check-in 🔒
+            </a>
+        </div>
+        
+        <!-- Chat with Sahay -->
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">💬</div>
+            <h3 style="color: var(--primary); margin-bottom: 1rem;">Chat with Sahay</h3>
+            <p style="color: var(--gray); margin-bottom: 2rem;">
+                Have a conversation in your preferred language. Get study tips, emotional support, or career guidance.
+            </p>
+            <a href="{% url 'wellness:chat' %}" class="btn btn-outline" style="padding: 1rem 2rem;">
+                Start Chatting
+            </a>
+        </div>
+    </div>
+    
+    <!-- Screening Options -->
+    <div class="card" style="margin-bottom: 3rem;">
+        <h3 style="color: var(--primary); margin-bottom: 2rem; text-align: center;">
+            Mental Health Screenings
+        </h3>
+        <p style="text-align: center; color: var(--gray); margin-bottom: 2rem;">
+            Professional screening tools to assess your mental wellbeing. All responses are private and secure.
+        </p>
+        
+        <div class="grid grid-2">
+            {% for screening in screening_types %}
+            <div class="card" style="border: 2px solid var(--gray-light); transition: border-color 0.3s;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h4 style="color: var(--primary);">{{ screening.name }}</h4>
+                    <span style="background: var(--accent); color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.9rem;">
+                        {{ screening.duration }}
+                    </span>
+                </div>
+                <p style="color: var(--gray); margin-bottom: 1.5rem;">{{ screening.description }}</p>
+                <a href="{% url 'wellness:screening' screening.id %}" class="btn btn-secondary" style="width: 100%;">
+                    Take {{ screening.id }} Assessment
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Wellness Resources -->
+    <div class="card">
+        <h3 style="color: var(--secondary); margin-bottom: 2rem; text-align: center;">
+            Wellness Resources & Support
+        </h3>
+        
+        <div class="grid grid-3">
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🧘‍♀️</div>
+                <h4 style="color: var(--primary); margin-bottom: 1rem;">Mindfulness</h4>
+                <p style="color: var(--gray); margin-bottom: 1rem;">
+                    Breathing exercises, meditation guides, and mindfulness techniques
+                </p>
+                <button class="btn btn-outline" onclick="showMindfulnessExercise()">
+                    Try Now
+                </button>
+            </div>
+            
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">📞</div>
+                <h4 style="color: var(--primary); margin-bottom: 1rem;">Crisis Support</h4>
+                <p style="color: var(--gray); margin-bottom: 1rem;">
+                    24/7 helplines and emergency resources for immediate support
+                </p>
+                <button class="btn btn-outline" onclick="showCrisisResources()">
+                    Get Help
+                </button>
+            </div>
+            
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">📚</div>
+                <h4 style="color: var(--primary); margin-bottom: 1rem;">Self-Help</h4>
+                <p style="color: var(--gray); margin-bottom: 1rem;">
+                    Articles, tips, and techniques for managing stress and anxiety
+                </p>
+                <button class="btn btn-outline" onclick="showSelfHelpResources()">
+                    Learn More
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for resources -->
+<div id="resourceModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="card" style="max-width: 500px; margin: 2rem; max-height: 80vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 id="modalTitle" style="color: var(--primary);"></h3>
+            <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+        </div>
+        <div id="modalContent"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function showMindfulnessExercise() {
+        const title = "🧘‍♀️ Mindfulness Exercise";
+        const content = `
+            <div style="text-align: center; padding: 1rem;">
+                <h4 style="margin-bottom: 1rem;">5-4-3-2-1 Grounding Technique</h4>
+                <p style="margin-bottom: 1rem;">Use this technique when you feel anxious or overwhelmed:</p>
+                <div style="text-align: left; background: var(--background); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <p><strong>5</strong> - Notice 5 things you can see around you</p>
+                    <p><strong>4</strong> - Notice 4 things you can touch</p>
+                    <p><strong>3</strong> - Notice 3 things you can hear</p>
+                    <p><strong>2</strong> - Notice 2 things you can smell</p>
+                    <p><strong>1</strong> - Notice 1 thing you can taste</p>
+                </div>
+                <button class="btn btn-primary" onclick="startBreathingExercise()">
+                    Start Guided Breathing
+                </button>
+            </div>
+        `;
+        showModal(title, content);
+    }
+    
+    function showCrisisResources() {
+        const title = "📞 Crisis Support Resources";
+        const content = `
+            <div style="padding: 1rem;">
+                <div style="background: var(--error); color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; text-align: center;">
+                    <strong>If you're having thoughts of self-harm, please reach out immediately!</strong>
+                </div>
+                
+                <h4 style="margin-bottom: 1rem;">🇮🇳 India Crisis Helplines</h4>
+                <div style="background: var(--background); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <p><strong>KIRAN Mental Health Helpline</strong></p>
+                    <p>📞 1800-599-0019 (Toll-free, 24/7)</p>
+                    <p>Multilingual support in 13 languages</p>
+                </div>
+                
+                <div style="background: var(--background); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <p><strong>Sneha Suicide Prevention</strong></p>
+                    <p>📞 044-24640050 (Chennai)</p>
+                    <p>📞 91-9820466726 (24/7)</p>
+                </div>
+                
+                <div style="background: var(--background); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <p><strong>iCALL Psychosocial Helpline</strong></p>
+                    <p>📞 9152987821</p>
+                    <p>Email: icall@tiss.edu</p>
+                    <p>Mon-Sat: 8 AM to 10 PM</p>
+                </div>
+                
+                <p style="text-align: center; margin-top: 1rem; color: var(--gray);">
+                    <strong>Remember:</strong> Seeking help is a sign of strength, not weakness.
+                </p>
+            </div>
+        `;
+        showModal(title, content);
+    }
+    
+    function showSelfHelpResources() {
+        const title = "📚 Self-Help Resources";
+        const content = `
+            <div style="padding: 1rem;">
+                <h4 style="margin-bottom: 1rem;">Quick Stress Relief Techniques</h4>
+                
+                <div style="background: var(--background); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <h5 style="color: var(--primary);">🌬️ Box Breathing</h5>
+                    <p>Inhale for 4 seconds → Hold for 4 seconds → Exhale for 4 seconds → Hold for 4 seconds</p>
+                </div>
+                
+                <div style="background: var(--background); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <h5 style="color: var(--primary);">🚶‍♀️ Physical Activity</h5>
+                    <p>Even a 5-minute walk can help reduce stress hormones and boost mood</p>
+                </div>
+                
+                <div style="background: var(--background); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <h5 style="color: var(--primary);">📝 Journaling</h5>
+                    <p>Write down your thoughts and feelings. It helps process emotions and gain clarity</p>
+                </div>
+                
+                <div style="background: var(--background); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <h5 style="color: var(--primary);">🤝 Social Connection</h5>
+                    <p>Reach out to friends, family, or support groups when you need to talk</p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 1rem;">
+                    <a href="{% url 'wellness:chat' %}" class="btn btn-secondary">
+                        Talk to Sahay AI
+                    </a>
+                </div>
+            </div>
+        `;
+        showModal(title, content);
+    }
+    
+    function showModal(title, content) {
+        document.getElementById('modalTitle').innerHTML = title;
+        document.getElementById('modalContent').innerHTML = content;
+        document.getElementById('resourceModal').style.display = 'flex';
+    }
+    
+    function closeModal() {
+        document.getElementById('resourceModal').style.display = 'none';
+    }
+    
+    function startBreathingExercise() {
+        let count = 0;
+        const phases = ['Inhale (4s)', 'Hold (4s)', 'Exhale (4s)', 'Hold (4s)'];
+        const colors = ['var(--primary)', 'var(--secondary)', 'var(--accent)', 'var(--success)'];
+        
+        const content = `
+            <div style="text-align: center; padding: 2rem;">
+                <div id="breathingCircle" style="width: 200px; height: 200px; border-radius: 50%; margin: 0 auto 2rem; transition: all 4s ease-in-out; background: var(--primary);"></div>
+                <h3 id="breathingPhase" style="margin-bottom: 1rem;">${phases[0]}</h3>
+                <p>Follow the circle and breathe slowly</p>
+                <button class="btn btn-outline" onclick="stopBreathing()">Stop</button>
+            </div>
+        `;
+        
+        document.getElementById('modalContent').innerHTML = content;
+        
+        window.breathingInterval = setInterval(() => {
+            count = (count + 1) % 4;
+            const circle = document.getElementById('breathingCircle');
+            const phase = document.getElementById('breathingPhase');
+            
+            if (circle && phase) {
+                phase.textContent = phases[count];
+                circle.style.background = colors[count];
+                circle.style.transform = count % 2 === 0 ? 'scale(1.5)' : 'scale(1)';
+            }
+        }, 4000);
+    }
+    
+    function stopBreathing() {
+        if (window.breathingInterval) {
+            clearInterval(window.breathingInterval);
+        }
+        closeModal();
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('resourceModal').onclick = function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    }
+    
+    // Add hover effects to screening cards
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            const originalBorder = card.style.borderColor;
+            card.addEventListener('mouseenter', function() {
+                if (this.style.border.includes('gray-light')) {
+                    this.style.borderColor = 'var(--primary)';
+                }
+            });
+            card.addEventListener('mouseleave', function() {
+                if (this.style.border.includes('var(--primary)')) {
+                    this.style.borderColor = 'var(--gray-light)';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

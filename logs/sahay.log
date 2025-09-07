@@ -1,0 +1,78 @@
+INFO 2025-09-07 17:03:44,236 autoreload Watching for file changes with StatReloader
+INFO 2025-09-07 17:05:59,797 autoreload Watching for file changes with StatReloader
+INFO 2025-09-07 17:06:34,036 data_processing Loaded 40 records from students.csv
+INFO 2025-09-07 17:06:34,039 data_processing Loaded 41 records from courses.csv
+INFO 2025-09-07 17:06:34,042 data_processing Loaded 20 records from sahayaks.csv
+INFO 2025-09-07 17:06:34,045 data_processing Loaded 22 records from screening_questions.csv
+INFO 2025-09-07 17:06:34,048 data_processing Loaded 40 records from wellness_sessions.csv
+INFO 2025-09-07 17:06:34,052 data_processing Loaded 40 records from actions.csv
+INFO 2025-09-07 17:06:34,055 data_processing Loaded 15 records from career_paths.csv
+INFO 2025-09-07 17:06:34,058 data_processing Loaded 40 records from learning_sessions.csv
+INFO 2025-09-07 17:06:34,061 data_processing Loaded 12 records from patterns.csv
+ERROR 2025-09-07 17:06:34,062 data_processing Error loading anonymous_reports.csv: Error tokenizing data. C error: Expected 10 fields in line 14, saw 13
+
+INFO 2025-09-07 17:06:34,067 data_processing Loaded 20 records from sahayak_sessions.csv
+INFO 2025-09-07 17:06:34,070 data_processing Loaded 20 records from student_career_plans.csv
+ERROR 2025-09-07 17:06:34,252 log Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\arrays\datetimelike.py", line 559, in _validate_comparison_value
+    self._check_compatible_with(other)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\arrays\datetimes.py", line 542, in _check_compatible_with
+    self._assert_tzawareness_compat(other)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\arrays\datetimes.py", line 788, in _assert_tzawareness_compat
+    raise TypeError(
+        "Cannot compare tz-naive and tz-aware datetime-like objects"
+    )
+TypeError: Cannot compare tz-naive and tz-aware datetime-like objects
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\arrays\datetimelike.py", line 1006, in _cmp_method
+    other = self._validate_comparison_value(other)
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\arrays\datetimelike.py", line 562, in _validate_comparison_value
+    raise InvalidComparison(other) from err
+pandas.errors.InvalidComparison: 2025-08-31 17:06:34.070910
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\views\generic\base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\views\generic\base.py", line 144, in dispatch
+    return handler(request, *args, **kwargs)
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\django\views\generic\base.py", line 228, in get
+    context = self.get_context_data(**kwargs)
+  File "D:\Contest\GCP Gen AI Hackathon\Code\core\views.py", line 29, in get_context_data
+    'active_sessions': len(wellness_df[wellness_df['created_at'] > (datetime.now() - timedelta(days=7))]) if not wellness_df.empty else 0,
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\ops\common.py", line 76, in new_method
+    return method(self, other)
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\arraylike.py", line 56, in __gt__
+    return self._cmp_method(other, operator.gt)
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\series.py", line 6130, in _cmp_method
+    res_values = ops.comparison_op(lvalues, rvalues, op)
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\ops\array_ops.py", line 330, in comparison_op
+    res_values = op(lvalues, rvalues)
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\ops\common.py", line 76, in new_method
+    return method(self, other)
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\arraylike.py", line 56, in __gt__
+    return self._cmp_method(other, operator.gt)
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\arrays\datetimelike.py", line 1008, in _cmp_method
+    return invalid_comparison(self, other, op)
+  File "C:\Users\Debz\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\ops\invalid.py", line 40, in invalid_comparison
+    raise TypeError(f"Invalid comparison between dtype={left.dtype} and {typ}")
+TypeError: Invalid comparison between dtype=datetime64[ns, UTC] and datetime
+ERROR 2025-09-07 17:06:34,265 basehttp "GET /?id=05714ed7-fa2f-497a-83f1-66d0fec4ae15&vscodeBrowserReqId=1757244993996 HTTP/1.1" 500 172684
+INFO 2025-09-07 17:06:55,648 autoreload D:\Contest\GCP Gen AI Hackathon\Code\sahay\wsgi.py changed, reloading.
+INFO 2025-09-07 17:06:56,602 autoreload Watching for file changes with StatReloader
+INFO 2025-09-07 17:26:05,929 autoreload Watching for file changes with StatReloader

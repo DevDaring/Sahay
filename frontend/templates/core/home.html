@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block title %}Sahay - Multi-Language AI Student Wellness Platform{% endblock %}
+
+{% block content %}
+<section class="hero" style="padding: 4rem 0; text-align: center;">
+    <div class="container fade-in">
+        <h1 style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem; font-weight: 700;">
+            🌟 Welcome to Sahay
+        </h1>
+        <p style="font-size: 1.3rem; color: var(--gray); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+            Your AI-powered wellness and learning companion supporting <strong>English, Hindi, and Bengali</strong>
+        </p>
+        
+        <!-- Quick Stats -->
+        <div class="grid grid-3" style="margin: 2rem 0; max-width: 800px; margin-left: auto; margin-right: auto;">
+            <div class="card" style="text-align: center;">
+                <h3 style="color: var(--primary); margin-bottom: 0.5rem;">{{ total_students }}+</h3>
+                <p>Students Supported</p>
+            </div>
+            <div class="card" style="text-align: center;">
+                <h3 style="color: var(--secondary); margin-bottom: 0.5rem;">{{ active_sessions }}+</h3>
+                <p>Active This Week</p>
+            </div>
+            <div class="card" style="text-align: center;">
+                <h3 style="color: var(--accent); margin-bottom: 0.5rem;">3</h3>
+                <p>Languages Supported</p>
+            </div>
+        </div>
+        
+        <!-- Language Selection -->
+        <div class="card" style="max-width: 500px; margin: 2rem auto;">
+            <h3 style="margin-bottom: 1rem;">Choose Your Preferred Language</h3>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <button class="btn btn-outline" onclick="selectLanguage('English')" id="lang-en">
+                    🇺🇸 English
+                </button>
+                <button class="btn btn-outline" onclick="selectLanguage('Hindi')" id="lang-hi">
+                    🇮🇳 हिंदी
+                </button>
+                <button class="btn btn-outline" onclick="selectLanguage('Bengali')" id="lang-bn">
+                    🇧🇩 বাংলা
+                </button>
+            </div>
+        </div>
+        
+        <!-- Quick Start Actions -->
+        <div style="margin-top: 2rem;">
+            <a href="{% url 'core:dashboard' %}" class="btn btn-primary pulse" style="font-size: 1.2rem; padding: 1rem 2rem; margin-right: 1rem;">
+                Start Your Journey →
+            </a>
+            <a href="{% url 'wellness:chat' %}" class="btn btn-secondary" style="font-size: 1.1rem; padding: 1rem 1.5rem;">
+                💬 Chat with Sahay
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section style="padding: 4rem 0; background: var(--white);">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 1rem; color: var(--primary); font-size: 2.5rem;">
+            How Sahay Helps You Thrive
+        </h2>
+        <p style="text-align: center; margin-bottom: 3rem; color: var(--gray); font-size: 1.1rem;">
+            Privacy-first AI platform with cultural awareness and real-time support
+        </p>
+        
+        <div class="grid grid-3">
+            {% for feature in features %}
+            <div class="card fade-in" style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">{{ feature.icon }}</div>
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">{{ feature.title }}</h3>
+                <p style="color: var(--gray);">{{ feature.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Technology Highlights -->
+<section style="padding: 4rem 0;">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 3rem; color: var(--primary);">
+            Cutting-Edge Technology
+        </h2>
+        
+        <div class="grid grid-2">
+            <div class="card">
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">🤖 Google Gemini 2.5 Flash</h3>
+                <ul style="color: var(--gray); line-height: 1.8;">
+                    <li>Latest AI model with enhanced reasoning</li>
+                    <li>Native multi-language understanding</li>
+                    <li>Real-time Google Search integration</li>
+                    <li>Culturally aware responses</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3 style="color: var(--secondary); margin-bottom: 1rem;">🔒 Privacy Protection</h3>
+                <ul style="color: var(--gray); line-height: 1.8;">
+                    <li>K-anonymity with k ≥ 5 threshold</li>
+                    <li>Hash-based student identification</li>
+                    <li>No personal chat transcripts stored</li>
+                    <li>GDPR-compliant data handling</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3 style="color: var(--accent); margin-bottom: 1rem;">📊 Smart Analytics</h3>
+                <ul style="color: var(--gray); line-height: 1.8;">
+                    <li>Pattern detection with privacy preservation</li>
+                    <li>Aggregate insights for educators</li>
+                    <li>Real-time wellness monitoring</li>
+                    <li>Predictive intervention recommendations</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">🌍 Cultural Awareness</h3>
+                <ul style="color: var(--gray); line-height: 1.8;">
+                    <li>Region-specific crisis resources</li>
+                    <li>Educational context understanding</li>
+                    <li>Local career market insights</li>
+                    <li>Culturally appropriate interventions</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section style="padding: 4rem 0; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; text-align: center;">
+    <div class="container">
+        <h2 style="margin-bottom: 1rem; font-size: 2.5rem;">Ready to Get Started?</h2>
+        <p style="margin-bottom: 2rem; font-size: 1.2rem; opacity: 0.9;">
+            Join thousands of students already using Sahay for holistic wellness and learning support
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{% url 'wellness:check' %}" class="btn" style="background: white; color: var(--primary); padding: 1rem 2rem;">
+                🧘 Start Wellness Check
+            </a>
+            <a href="{% url 'learning:career' %}" class="btn" style="background: rgba(255,255,255,0.2); color: white; border: 2px solid white; padding: 1rem 2rem;">
+                🎯 Explore Career Paths
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function selectLanguage(lang) {
+        // Reset all buttons
+        document.querySelectorAll('[id^="lang-"]').forEach(btn => {
+            btn.className = 'btn btn-outline';
+        });
+        
+        // Highlight selected
+        const selectedBtn = document.getElementById(`lang-${lang.toLowerCase() === 'hindi' ? 'hi' : lang.toLowerCase() === 'bengali' ? 'bn' : 'en'}`);
+        selectedBtn.className = 'btn btn-primary';
+        
+        // Store preference
+        localStorage.setItem('preferred_language', lang);
+        
+        // Show confirmation
+        const messages = {
+            'English': 'Language set to English',
+            'Hindi': 'भाषा हिंदी पर सेट की गई',
+            'Bengali': 'ভাষা বাংলায় সেট করা হয়েছে'
+        };
+        
+        // Show a non-intrusive notification
+        showNotification(messages[lang], 'success');
+    }
+    
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? 'var(--success)' : 'var(--primary)'};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        `;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+    
+    // Auto-select saved language preference
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedLang = localStorage.getItem('preferred_language');
+        if (savedLang) {
+            selectLanguage(savedLang);
+        }
+    });
+    
+    // Add slide-in animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

@@ -1,0 +1,736 @@
+{% extends 'base.html' %}
+
+{% block title %}Career Planning - Sahay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .career-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .career-hero {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .career-section {
+        margin-bottom: 3rem;
+    }
+    
+    .career-path-card {
+        border: 2px solid var(--gray-light);
+        border-radius: 12px;
+        padding: 2rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: white;
+    }
+    
+    .career-path-card:hover {
+        border-color: var(--primary);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .career-path-card.selected {
+        border-color: var(--primary);
+        background: var(--primary-light);
+    }
+    
+    .skill-tag {
+        display: inline-block;
+        background: var(--gray-light);
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        margin: 0.2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .skill-tag.strong {
+        background: var(--success);
+        color: white;
+    }
+    
+    .skill-tag.developing {
+        background: var(--accent);
+        color: white;
+    }
+    
+    .step-indicator {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+    
+    .step-indicator::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        right: 20px;
+        height: 2px;
+        background: var(--gray-light);
+        z-index: 1;
+    }
+    
+    .step-indicator-progress {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        height: 2px;
+        background: var(--primary);
+        z-index: 2;
+        transition: width 0.5s ease;
+    }
+    
+    .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 3;
+    }
+    
+    .step-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--gray-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .step.active .step-circle {
+        background: var(--primary);
+    }
+    
+    .step.completed .step-circle {
+        background: var(--success);
+    }
+    
+    .step-label {
+        font-size: 0.9rem;
+        color: var(--gray);
+        text-align: center;
+        font-weight: 500;
+    }
+    
+    .step.active .step-label {
+        color: var(--primary);
+        font-weight: 600;
+    }
+    
+    .roadmap-timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+    
+    .roadmap-timeline::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--gray-light);
+    }
+    
+    .roadmap-item {
+        position: relative;
+        padding-bottom: 2rem;
+    }
+    
+    .roadmap-item::before {
+        content: '';
+        position: absolute;
+        left: -7px;
+        top: 8px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: var(--primary);
+    }
+    
+    .roadmap-content {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border-left: 4px solid var(--primary);
+        margin-left: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .salary-range {
+        background: linear-gradient(135deg, var(--success), var(--accent));
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+    
+    .job-market-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .market-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    
+    .market-dot.high { background: var(--success); }
+    .market-dot.medium { background: var(--accent); }
+    .market-dot.low { background: var(--error); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="career-container">
+    <!-- Hero Section -->
+    <div class="career-hero">
+        <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">🎯 Career Planning Hub</h1>
+        <p style="font-size: 1.2rem; opacity: 0.9; margin-bottom: 2rem;">
+            Discover your ideal career path with AI-powered insights and personalized recommendations
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <button onclick="startCareerAssessment()" class="btn" style="background: white; color: var(--primary); padding: 1rem 2rem; font-weight: 600;">
+                🧭 Start Career Assessment
+            </button>
+            <button onclick="exploreCareerPaths()" class="btn btn-outline" style="border-color: white; color: white; padding: 1rem 2rem;">
+                🔍 Explore Career Paths
+            </button>
+        </div>
+    </div>
+    
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+        <div class="step-indicator-progress" style="width: 20%;"></div>
+        <div class="step active">
+            <div class="step-circle">1</div>
+            <div class="step-label">Assessment</div>
+        </div>
+        <div class="step">
+            <div class="step-circle">2</div>
+            <div class="step-label">Exploration</div>
+        </div>
+        <div class="step">
+            <div class="step-circle">3</div>
+            <div class="step-label">Planning</div>
+        </div>
+        <div class="step">
+            <div class="step-circle">4</div>
+            <div class="step-label">Action</div>
+        </div>
+        <div class="step">
+            <div class="step-circle">5</div>
+            <div class="step-label">Growth</div>
+        </div>
+    </div>
+    
+    <!-- Career Paths Recommendation -->
+    <div class="career-section">
+        <h2 style="color: var(--primary); margin-bottom: 2rem; text-align: center;">
+            🌟 Recommended Career Paths
+        </h2>
+        
+        <div class="grid grid-2" style="margin-bottom: 2rem;">
+            {% for path in career_paths %}
+            <div class="career-path-card" onclick="selectCareerPath('{{ path.id }}')">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="font-size: 3rem;">{{ path.icon }}</div>
+                        <div>
+                            <h3 style="color: var(--primary); margin-bottom: 0.5rem;">{{ path.title }}</h3>
+                            <p style="color: var(--gray); font-size: 0.9rem;">{{ path.category }}</p>
+                        </div>
+                    </div>
+                    <span style="background: var(--success); color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem;">
+                        {{ path.match_percentage }}% Match
+                    </span>
+                </div>
+                
+                <div class="job-market-indicator">
+                    <div class="market-dot {{ path.demand_level }}"></div>
+                    <span style="font-size: 0.9rem; color: var(--gray);">
+                        Job Demand: {{ path.demand_level|title }}
+                    </span>
+                </div>
+                
+                <div class="salary-range" style="margin-bottom: 1rem;">
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Expected Salary Range</div>
+                    <div style="font-size: 1.4rem; font-weight: bold;">{{ path.salary_range }}</div>
+                </div>
+                
+                <p style="color: var(--gray); margin-bottom: 1.5rem; line-height: 1.5;">
+                    {{ path.description }}
+                </p>
+                
+                <div style="margin-bottom: 1rem;">
+                    <h4 style="font-size: 1rem; margin-bottom: 0.5rem; color: var(--primary);">Key Skills Required:</h4>
+                    {% for skill in path.skills %}
+                    <span class="skill-tag {{ skill.level }}">{{ skill.name }}</span>
+                    {% endfor %}
+                </div>
+                
+                <button class="btn btn-outline" style="width: 100%;" onclick="exploreCareerDetails('{{ path.id }}')">
+                    📋 View Detailed Roadmap →
+                </button>
+            </div>
+            {% empty %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🧭</div>
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">Start Your Career Discovery</h3>
+                <p style="color: var(--gray); margin-bottom: 2rem;">
+                    Complete the career assessment to get personalized career path recommendations based on your skills, interests, and market trends.
+                </p>
+                <button onclick="startCareerAssessment()" class="btn btn-primary" style="padding: 1rem 2rem;">
+                    🚀 Take Assessment Now
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Skills Gap Analysis -->
+    <div class="career-section">
+        <div class="card">
+            <h3 style="color: var(--secondary); margin-bottom: 2rem; text-align: center;">
+                📊 Skills Gap Analysis
+            </h3>
+            
+            <div class="grid grid-2">
+                <div>
+                    <h4 style="color: var(--success); margin-bottom: 1rem;">🎯 Your Strong Skills</h4>
+                    <div style="margin-bottom: 2rem;">
+                        {% for skill in strong_skills %}
+                        <span class="skill-tag strong">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <h4 style="color: var(--primary); margin-bottom: 1rem;">🏆 Top Skills in Demand</h4>
+                    <div>
+                        {% for skill in in_demand_skills %}
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; border-bottom: 1px solid var(--gray-light);">
+                            <span>{{ skill.name }}</span>
+                            <span style="background: var(--accent); color: white; padding: 0.2rem 0.6rem; border-radius: 10px; font-size: 0.8rem;">
+                                {{ skill.demand }}% jobs
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 style="color: var(--accent); margin-bottom: 1rem;">📈 Skills to Develop</h4>
+                    <div style="margin-bottom: 2rem;">
+                        {% for skill in skills_to_develop %}
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.8rem; background: var(--background); border-radius: 8px; margin-bottom: 0.5rem;">
+                            <div>
+                                <div style="font-weight: 600;">{{ skill.name }}</div>
+                                <div style="font-size: 0.8rem; color: var(--gray);">{{ skill.importance }}</div>
+                            </div>
+                            <button onclick="findSkillCourses('{{ skill.name }}')" class="btn btn-outline" style="padding: 0.3rem 0.8rem; font-size: 0.8rem;">
+                                📚 Learn
+                            </button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <button onclick="createSkillPlan()" class="btn btn-primary" style="width: 100%;">
+                            🎯 Create Personalized Skill Plan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Career Action Plan -->
+    <div class="career-section">
+        <div class="card">
+            <h3 style="color: var(--accent); margin-bottom: 2rem; text-align: center;">
+                📋 Your 6-Month Career Action Plan
+            </h3>
+            
+            <div class="roadmap-timeline">
+                <div class="roadmap-item">
+                    <div class="roadmap-content">
+                        <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Month 1-2: Foundation Building</h4>
+                        <ul style="margin-bottom: 1rem; line-height: 1.6;">
+                            <li>Complete career assessment and personality tests</li>
+                            <li>Research target companies and roles</li>
+                            <li>Update resume and LinkedIn profile</li>
+                            <li>Start building portfolio projects</li>
+                        </ul>
+                        <div style="display: flex; gap: 1rem;">
+                            <button onclick="showFoundationResources()" class="btn btn-outline" style="font-size: 0.9rem;">
+                                📚 Resources
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="roadmap-item">
+                    <div class="roadmap-content">
+                        <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Month 3-4: Skill Development</h4>
+                        <ul style="margin-bottom: 1rem; line-height: 1.6;">
+                            <li>Enroll in relevant courses and certifications</li>
+                            <li>Work on hands-on projects</li>
+                            <li>Join professional communities and networks</li>
+                            <li>Seek mentorship opportunities</li>
+                        </ul>
+                        <div style="display: flex; gap: 1rem;">
+                            <a href="{% url 'learning:index' %}" class="btn btn-outline" style="font-size: 0.9rem;">
+                                🎓 Browse Courses
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="roadmap-item">
+                    <div class="roadmap-content">
+                        <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Month 5-6: Job Search & Application</h4>
+                        <ul style="margin-bottom: 1rem; line-height: 1.6;">
+                            <li>Apply to target positions</li>
+                            <li>Practice interview skills</li>
+                            <li>Network with industry professionals</li>
+                            <li>Negotiate offers and make decisions</li>
+                        </ul>
+                        <div style="display: flex; gap: 1rem;">
+                            <button onclick="showJobSearchResources()" class="btn btn-outline" style="font-size: 0.9rem;">
+                                🔍 Job Search Tips
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="grid grid-3">
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 1rem;">💬</div>
+            <h4 style="color: var(--primary); margin-bottom: 1rem;">Career Counseling</h4>
+            <p style="color: var(--gray); margin-bottom: 1.5rem; font-size: 0.9rem;">
+                Get personalized career advice from our AI counselor
+            </p>
+            <a href="{% url 'wellness:chat' %}" class="btn btn-primary" style="width: 100%;">
+                Chat with Sahay
+            </a>
+        </div>
+        
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 1rem;">📊</div>
+            <h4 style="color: var(--primary); margin-bottom: 1rem;">Market Insights</h4>
+            <p style="color: var(--gray); margin-bottom: 1.5rem; font-size: 0.9rem;">
+                Latest job market trends and salary data
+            </p>
+            <button onclick="showMarketInsights()" class="btn btn-primary" style="width: 100%;">
+                View Insights
+            </button>
+        </div>
+        
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 1rem;">🎯</div>
+            <h4 style="color: var(--primary); margin-bottom: 1rem;">Goal Tracking</h4>
+            <p style="color: var(--gray); margin-bottom: 1.5rem; font-size: 0.9rem;">
+                Set and track your career milestones
+            </p>
+            <button onclick="createCareerGoals()" class="btn btn-primary" style="width: 100%;">
+                Set Goals
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for various career resources -->
+<div id="careerModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="card" style="max-width: 600px; margin: 2rem; max-height: 80vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 id="modalTitle" style="color: var(--primary);"></h3>
+            <button onclick="closeCareerModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+        </div>
+        <div id="modalContent"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function startCareerAssessment() {
+        const content = `
+            <div style="padding: 1rem;">
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">🧭 Career Assessment</h3>
+                <p style="margin-bottom: 2rem;">Our comprehensive assessment will analyze:</p>
+                <div style="background: var(--background); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <ul style="line-height: 1.8;">
+                        <li><strong>Personality & Work Style:</strong> What environments you thrive in</li>
+                        <li><strong>Skills & Strengths:</strong> Your current capabilities and talents</li>
+                        <li><strong>Interests & Values:</strong> What motivates and drives you</li>
+                        <li><strong>Career Goals:</strong> Short-term and long-term aspirations</li>
+                        <li><strong>Market Alignment:</strong> Opportunities matching your profile</li>
+                    </ul>
+                </div>
+                <p style="color: var(--gray); margin-bottom: 2rem; font-size: 0.9rem;">
+                    <strong>Duration:</strong> 15-20 minutes | <strong>Questions:</strong> 50+ adaptive questions
+                </p>
+                <div style="text-align: center;">
+                    <a href="{% url 'wellness:chat' %}" class="btn btn-primary" style="margin-right: 1rem;">
+                        🚀 Start Assessment
+                    </a>
+                    <button onclick="closeCareerModal()" class="btn btn-outline">
+                        Later
+                    </button>
+                </div>
+            </div>
+        `;
+        showModal("🧭 Career Assessment", content);
+    }
+    
+    function exploreCareerPaths() {
+        const content = `
+            <div style="padding: 1rem;">
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">🔍 Career Path Explorer</h3>
+                <p style="margin-bottom: 2rem;">Explore different career paths by:</p>
+                <div class="grid grid-2" style="gap: 1rem; margin-bottom: 2rem;">
+                    <button onclick="exploreByCat('technology')" class="btn btn-outline" style="padding: 1rem;">
+                        💻 Technology
+                    </button>
+                    <button onclick="exploreByCat('healthcare')" class="btn btn-outline" style="padding: 1rem;">
+                        🏥 Healthcare
+                    </button>
+                    <button onclick="exploreByCat('business')" class="btn btn-outline" style="padding: 1rem;">
+                        💼 Business
+                    </button>
+                    <button onclick="exploreByCat('creative')" class="btn btn-outline" style="padding: 1rem;">
+                        🎨 Creative
+                    </button>
+                    <button onclick="exploreByCat('education')" class="btn btn-outline" style="padding: 1rem;">
+                        📚 Education
+                    </button>
+                    <button onclick="exploreByCat('finance')" class="btn btn-outline" style="padding: 1rem;">
+                        💰 Finance
+                    </button>
+                </div>
+                <div style="text-align: center;">
+                    <a href="{% url 'wellness:chat' %}" class="btn btn-primary">
+                        💬 Chat for Guidance
+                    </a>
+                </div>
+            </div>
+        `;
+        showModal("🔍 Career Path Explorer", content);
+    }
+    
+    function createSkillPlan() {
+        const content = `
+            <div style="padding: 1rem;">
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">🎯 Personalized Skill Development Plan</h3>
+                <p style="margin-bottom: 2rem;">Based on your career goals and current skills, we'll create a customized learning path that includes:</p>
+                <div style="background: var(--background); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <ul style="line-height: 1.8;">
+                        <li><strong>Priority Skills:</strong> Most important skills for your career goals</li>
+                        <li><strong>Learning Resources:</strong> Courses, tutorials, and practice projects</li>
+                        <li><strong>Timeline:</strong> Realistic milestones and deadlines</li>
+                        <li><strong>Progress Tracking:</strong> Regular assessments and feedback</li>
+                        <li><strong>Portfolio Projects:</strong> Real-world applications to showcase skills</li>
+                    </ul>
+                </div>
+                <div style="text-align: center;">
+                    <a href="{% url 'wellness:chat' %}" class="btn btn-primary" style="margin-right: 1rem;">
+                        🤖 Create Plan with AI
+                    </a>
+                    <a href="{% url 'learning:index' %}" class="btn btn-outline">
+                        📚 Browse Courses
+                    </a>
+                </div>
+            </div>
+        `;
+        showModal("🎯 Skill Development Plan", content);
+    }
+    
+    function showMarketInsights() {
+        const content = `
+            <div style="padding: 1rem;">
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">📊 Job Market Insights</h3>
+                
+                <div style="background: var(--background); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <h4 style="color: var(--success); margin-bottom: 1rem;">🔥 Trending Skills This Month</h4>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                        <span class="skill-tag strong">Artificial Intelligence</span>
+                        <span class="skill-tag strong">Data Science</span>
+                        <span class="skill-tag strong">Cloud Computing</span>
+                        <span class="skill-tag strong">UX/UI Design</span>
+                        <span class="skill-tag strong">Digital Marketing</span>
+                    </div>
+                </div>
+                
+                <div style="background: var(--background); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <h4 style="color: var(--accent); margin-bottom: 1rem;">💰 Salary Trends</h4>
+                    <div style="line-height: 1.6;">
+                        <p><strong>Software Engineer:</strong> ₹8-25 LPA (↑15% from last year)</p>
+                        <p><strong>Data Analyst:</strong> ₹6-18 LPA (↑20% from last year)</p>
+                        <p><strong>Digital Marketing:</strong> ₹4-15 LPA (↑12% from last year)</p>
+                        <p><strong>Product Manager:</strong> ₹15-35 LPA (↑18% from last year)</p>
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <a href="{% url 'analytics:index' %}" class="btn btn-primary">
+                        📈 View Full Analytics
+                    </a>
+                </div>
+            </div>
+        `;
+        showModal("📊 Job Market Insights", content);
+    }
+    
+    function createCareerGoals() {
+        const content = `
+            <div style="padding: 1rem;">
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">🎯 Career Goal Setting</h3>
+                <p style="margin-bottom: 2rem;">Set SMART career goals and track your progress:</p>
+                
+                <div style="background: var(--background); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <h4 style="color: var(--secondary); margin-bottom: 1rem;">Goal Categories</h4>
+                    <div class="grid grid-2" style="gap: 1rem;">
+                        <div style="padding: 1rem; background: white; border-radius: 8px;">
+                            <h5 style="color: var(--primary);">🎓 Skill Goals</h5>
+                            <p style="font-size: 0.9rem;">Learn new technologies, earn certifications</p>
+                        </div>
+                        <div style="padding: 1rem; background: white; border-radius: 8px;">
+                            <h5 style="color: var(--primary);">💼 Career Goals</h5>
+                            <p style="font-size: 0.9rem;">Job roles, promotions, salary targets</p>
+                        </div>
+                        <div style="padding: 1rem; background: white; border-radius: 8px;">
+                            <h5 style="color: var(--primary);">🌐 Network Goals</h5>
+                            <p style="font-size: 0.9rem;">Building professional connections</p>
+                        </div>
+                        <div style="padding: 1rem; background: white; border-radius: 8px;">
+                            <h5 style="color: var(--primary);">📚 Learning Goals</h5>
+                            <p style="font-size: 0.9rem;">Courses, workshops, conferences</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <a href="{% url 'wellness:chat' %}" class="btn btn-primary">
+                        🤖 Set Goals with AI Coach
+                    </a>
+                </div>
+            </div>
+        `;
+        showModal("🎯 Career Goal Setting", content);
+    }
+    
+    function showModal(title, content) {
+        document.getElementById('modalTitle').innerHTML = title;
+        document.getElementById('modalContent').innerHTML = content;
+        document.getElementById('careerModal').style.display = 'flex';
+    }
+    
+    function closeCareerModal() {
+        document.getElementById('careerModal').style.display = 'none';
+    }
+    
+    function selectCareerPath(pathId) {
+        // Remove selection from all cards
+        document.querySelectorAll('.career-path-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        // Select clicked card
+        event.currentTarget.classList.add('selected');
+        
+        // Update progress
+        updateStepProgress(2);
+    }
+    
+    function updateStepProgress(stepNum) {
+        const steps = document.querySelectorAll('.step');
+        const progressBar = document.querySelector('.step-indicator-progress');
+        
+        steps.forEach((step, index) => {
+            if (index < stepNum) {
+                step.classList.add('completed');
+                step.classList.remove('active');
+            } else if (index === stepNum - 1) {
+                step.classList.add('active');
+                step.classList.remove('completed');
+            } else {
+                step.classList.remove('active', 'completed');
+            }
+        });
+        
+        const progressWidth = ((stepNum - 1) / (steps.length - 1)) * 100;
+        progressBar.style.width = progressWidth + '%';
+    }
+    
+    function exploreByCat(category) {
+        const categories = {
+            'technology': 'Software Engineering, Data Science, Cybersecurity, AI/ML',
+            'healthcare': 'Medical, Nursing, Healthcare Administration, Biotechnology',
+            'business': 'Management, Consulting, Operations, Strategy',
+            'creative': 'Design, Marketing, Content Creation, Media Production',
+            'education': 'Teaching, Training, Educational Technology, Research',
+            'finance': 'Banking, Investment, Accounting, Financial Planning'
+        };
+        
+        const content = `
+            <div style="padding: 1rem;">
+                <h4 style="color: var(--primary); margin-bottom: 1rem;">Popular paths in ${category.charAt(0).toUpperCase() + category.slice(1)}:</h4>
+                <p style="margin-bottom: 2rem;">${categories[category]}</p>
+                <div style="text-align: center;">
+                    <a href="{% url 'wellness:chat' %}" class="btn btn-primary">
+                        💬 Learn More About These Paths
+                    </a>
+                </div>
+            </div>
+        `;
+        showModal(`🔍 ${category.charAt(0).toUpperCase() + category.slice(1)} Careers`, content);
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('careerModal').onclick = function(e) {
+        if (e.target === this) {
+            closeCareerModal();
+        }
+    }
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add hover effects to career cards
+        document.querySelectorAll('.career-path-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('selected')) {
+                    this.style.borderColor = 'var(--secondary)';
+                }
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('selected')) {
+                    this.style.borderColor = 'var(--gray-light)';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

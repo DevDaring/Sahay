@@ -4,24 +4,17 @@ sahay/settings.py - Django settings for Sahay project
 
 import os
 from pathlib import Path
-import environ
 
 # Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Initialize environment variables
-env = environ.Env(
-    DEBUG=(bool, False)
-)
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY', default='django-insecure-change-this-in-production')
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG', default=True)
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
 # Application definition
 INSTALLED_APPS = [
@@ -33,10 +26,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     
-    # Third party apps
-    'rest_framework',
-    'corsheaders',
-    
     # Our apps
     'core.apps.CoreConfig',
     'wellness.apps.WellnessConfig',
@@ -47,8 +36,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -61,7 +49,7 @@ ROOT_URLCONF = 'sahay.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR / 'frontend' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -109,7 +97,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'static']
 
 # Media files
 MEDIA_URL = '/media/'
@@ -135,36 +123,29 @@ REST_FRAMEWORK = {
 }
 
 # CORS settings
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-]
-CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only for development
-
 # Celery Configuration
-CELERY_BROKER_URL = env('REDIS_URL', default='redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = env('REDIS_URL', default='redis://localhost:6379/0')
+CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
 # GCP Configuration
-GCP_PROJECT_ID = env('GCP_PROJECT_ID', default='sahay-hackathon-2024')
-GCP_LOCATION = env('GCP_LOCATION', default='us-central1')
-GCP_BUCKET_NAME = env('GCP_BUCKET_NAME', default='sahay-data-bucket')
-VERTEX_AI_MODEL = env('VERTEX_AI_MODEL', default='gemini-1.5-flash')
+GCP_PROJECT_ID = os.getenv('GCP_PROJECT_ID', 'sahay-hackathon-2024')
+GCP_LOCATION = os.getenv('GCP_LOCATION', 'us-central1')
+GCP_BUCKET_NAME = os.getenv('GCP_BUCKET_NAME', 'sahay-data-bucket')
+VERTEX_AI_MODEL = os.getenv('VERTEX_AI_MODEL', 'gemini-1.5-flash')
 
 # Privacy Configuration
-K_ANONYMITY_THRESHOLD = env.int('K_ANONYMITY_THRESHOLD', default=5)
-DATA_RETENTION_DAYS = env.int('DATA_RETENTION_DAYS', default=90)
+K_ANONYMITY_THRESHOLD = int(os.getenv('K_ANONYMITY_THRESHOLD', '5'))
+DATA_RETENTION_DAYS = int(os.getenv('DATA_RETENTION_DAYS', '90'))
 
 # Risk Level Configuration
 RISK_LEVELS = {
-    'L1': (0, env.int('RISK_L1_MAX', default=6)),
-    'L2': (env.int('RISK_L1_MAX', default=6) + 1, env.int('RISK_L2_MAX', default=10)),
-    'L3': (env.int('RISK_L2_MAX', default=10) + 1, env.int('RISK_L3_MAX', default=15)),
+    'L1': (0, int(os.getenv('RISK_L1_MAX', '6'))),
+    'L2': (int(os.getenv('RISK_L1_MAX', '6')) + 1, int(os.getenv('RISK_L2_MAX', '10'))),
+    'L3': (int(os.getenv('RISK_L2_MAX', '10')) + 1, int(os.getenv('RISK_L3_MAX', '15'))),
 }
 
 # Data directories

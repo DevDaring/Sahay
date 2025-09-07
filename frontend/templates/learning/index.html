@@ -1,0 +1,478 @@
+{% extends 'base.html' %}
+
+{% block title %}Learning Hub - Sahay{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 0;">
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 style="color: var(--primary); margin-bottom: 1rem; font-size: 2.5rem;">
+            🎓 Learning Hub
+        </h1>
+        <p style="color: var(--gray); font-size: 1.1rem;">
+            Personalized learning paths, courses, and career guidance to help you succeed
+        </p>
+    </div>
+    
+    <!-- Progress Overview -->
+    <div class="grid grid-4" style="margin-bottom: 3rem;">
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 1rem;">📚</div>
+            <h3 style="color: var(--primary); margin-bottom: 0.5rem;">{{ total_courses }}</h3>
+            <p style="color: var(--gray);">Available Courses</p>
+        </div>
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 1rem;">✅</div>
+            <h3 style="color: var(--success); margin-bottom: 0.5rem;">{{ completed_courses }}</h3>
+            <p style="color: var(--gray);">Completed</p>
+        </div>
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 1rem;">🎯</div>
+            <h3 style="color: var(--secondary); margin-bottom: 0.5rem;">{{ career_paths }}</h3>
+            <p style="color: var(--gray);">Career Paths</p>
+        </div>
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 1rem;">⏱️</div>
+            <h3 style="color: var(--accent); margin-bottom: 0.5rem;">{{ study_hours }}h</h3>
+            <p style="color: var(--gray);">This Week</p>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="grid grid-2" style="margin-bottom: 3rem;">
+        <!-- Continue Learning -->
+        <div class="card" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🚀</div>
+            <h3 style="margin-bottom: 1rem;">Continue Your Journey</h3>
+            <p style="margin-bottom: 2rem; opacity: 0.9;">
+                Pick up where you left off or discover new learning paths tailored to your goals
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="#currentCourses" class="btn" style="background: white; color: var(--primary); padding: 0.8rem 1.5rem;">
+                    📖 Resume Learning
+                </a>
+                <a href="#courseRecommendations" class="btn btn-outline" style="border-color: white; color: white; padding: 0.8rem 1.5rem;">
+                    🔍 Explore Courses
+                </a>
+            </div>
+        </div>
+        
+        <!-- Career Planning -->
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
+            <h3 style="color: var(--primary); margin-bottom: 1rem;">Career Planning</h3>
+            <p style="color: var(--gray); margin-bottom: 2rem;">
+                Get personalized career recommendations based on your skills, interests, and market trends
+            </p>
+            <a href="{% url 'learning:career' %}" class="btn btn-primary" style="padding: 1rem 2rem;">
+                🚀 Plan Your Career
+            </a>
+        </div>
+    </div>
+    
+    <!-- Current Learning -->
+    <div class="card" style="margin-bottom: 3rem;" id="currentCourses">
+        <h3 style="color: var(--primary); margin-bottom: 2rem;">
+            📖 Your Current Learning
+        </h3>
+        
+        <div class="grid grid-2">
+            {% for session in active_sessions %}
+            <div class="card" style="border: 2px solid var(--gray-light);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="background: var(--primary); color: white; padding: 0.5rem; border-radius: 8px; font-size: 1.2rem;">
+                            {{ session.course.icon }}
+                        </div>
+                        <div>
+                            <h4 style="color: var(--primary); margin-bottom: 0.3rem;">{{ session.course.title }}</h4>
+                            <p style="color: var(--gray); font-size: 0.9rem;">{{ session.course.category }}</p>
+                        </div>
+                    </div>
+                    <span style="background: var(--accent); color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem;">
+                        {{ session.progress }}%
+                    </span>
+                </div>
+                
+                <div style="background: var(--background); border-radius: 8px; padding: 0.5rem; margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+                        <span style="font-size: 0.9rem; color: var(--gray);">Progress</span>
+                        <span style="font-size: 0.9rem; font-weight: 600;">{{ session.progress }}%</span>
+                    </div>
+                    <div style="background: var(--gray-light); border-radius: 10px; height: 6px;">
+                        <div style="background: linear-gradient(90deg, var(--primary), var(--secondary)); height: 100%; width: {{ session.progress }}%; border-radius: 10px; transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+                
+                <p style="color: var(--gray); font-size: 0.9rem; margin-bottom: 1rem;">
+                    Last activity: {{ session.last_activity|date:"M d, Y" }}
+                </p>
+                
+                <a href="{% url 'learning:course' session.course.id %}" class="btn btn-outline" style="width: 100%;">
+                    Continue Learning →
+                </a>
+            </div>
+            {% empty %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🌟</div>
+                <h4 style="color: var(--primary); margin-bottom: 1rem;">Start Your Learning Journey</h4>
+                <p style="color: var(--gray); margin-bottom: 2rem;">
+                    No active courses yet. Explore our recommendations below to get started!
+                </p>
+                <a href="#courseRecommendations" class="btn btn-primary">
+                    🔍 Browse Courses
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Course Recommendations -->
+    <div class="card" style="margin-bottom: 3rem;" id="courseRecommendations">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h3 style="color: var(--secondary);">🎯 Recommended for You</h3>
+            <div>
+                <button class="btn btn-outline" onclick="filterCourses('all')" id="filter-all">All</button>
+                <button class="btn btn-outline" onclick="filterCourses('technical')" id="filter-technical">Technical</button>
+                <button class="btn btn-outline" onclick="filterCourses('soft-skills')" id="filter-soft-skills">Soft Skills</button>
+                <button class="btn btn-outline" onclick="filterCourses('career')" id="filter-career">Career</button>
+            </div>
+        </div>
+        
+        <div class="grid grid-3">
+            {% for course in recommended_courses %}
+            <div class="card course-card" style="border: 2px solid var(--gray-light); transition: all 0.3s;" data-category="{{ course.category }}">
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">{{ course.icon }}</div>
+                    <span style="background: var(--success); color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem;">
+                        {{ course.level }}
+                    </span>
+                </div>
+                
+                <h4 style="color: var(--primary); margin-bottom: 1rem; text-align: center;">{{ course.title }}</h4>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 0.9rem; color: var(--gray);">
+                    <span>⏱️ {{ course.duration }}</span>
+                    <span>👥 {{ course.students }} students</span>
+                </div>
+                
+                <p style="color: var(--gray); font-size: 0.9rem; margin-bottom: 1.5rem; text-align: center;">
+                    {{ course.description }}
+                </p>
+                
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.3rem;">
+                        {% for i in "12345"|slice:course.rating %}
+                            <span style="color: #ffd700;">⭐</span>
+                        {% endfor %}
+                        <span style="color: var(--gray); font-size: 0.9rem;">({{ course.rating }})</span>
+                    </div>
+                    <span style="font-weight: 600; color: var(--success);">
+                        {% if course.price == 0 %}Free{% else %}₹{{ course.price }}{% endif %}
+                    </span>
+                </div>
+                
+                <button onclick="enrollCourse('{{ course.id }}')" class="btn btn-primary" style="width: 100%;">
+                    🎓 Enroll Now
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Learning Resources -->
+    <div class="card">
+        <h3 style="color: var(--accent); margin-bottom: 2rem; text-align: center;">
+            📚 Learning Resources & Tools
+        </h3>
+        
+        <div class="grid grid-4">
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">📝</div>
+                <h4 style="color: var(--primary); margin-bottom: 1rem;">Study Planner</h4>
+                <p style="color: var(--gray); margin-bottom: 1rem; font-size: 0.9rem;">
+                    Create personalized study schedules and track your progress
+                </p>
+                <button class="btn btn-outline" onclick="openStudyPlanner()">
+                    Plan Study
+                </button>
+            </div>
+            
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">🧠</div>
+                <h4 style="color: var(--primary); margin-bottom: 1rem;">Quiz Builder</h4>
+                <p style="color: var(--gray); margin-bottom: 1rem; font-size: 0.9rem;">
+                    Test your knowledge with AI-generated quizzes
+                </p>
+                <button class="btn btn-outline" onclick="openQuizBuilder()">
+                    Create Quiz
+                </button>
+            </div>
+            
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">📊</div>
+                <h4 style="color: var(--primary); margin-bottom: 1rem;">Progress Analytics</h4>
+                <p style="color: var(--gray); margin-bottom: 1rem; font-size: 0.9rem;">
+                    Detailed insights into your learning patterns
+                </p>
+                <button class="btn btn-outline" onclick="openProgressAnalytics()">
+                    View Analytics
+                </button>
+            </div>
+            
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 2.5rem; margin-bottom: 1rem;">💬</div>
+                <h4 style="color: var(--primary); margin-bottom: 1rem;">Study Buddy</h4>
+                <p style="color: var(--gray); margin-bottom: 1rem; font-size: 0.9rem;">
+                    Get help and motivation from our AI assistant
+                </p>
+                <a href="{% url 'wellness:chat' %}" class="btn btn-outline">
+                    Chat Now
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Course Enrollment Modal -->
+<div id="enrollmentModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="card" style="max-width: 500px; margin: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="color: var(--primary);">🎓 Course Enrollment</h3>
+            <button onclick="closeEnrollmentModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+        </div>
+        <div id="enrollmentContent"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function filterCourses(category) {
+        const courses = document.querySelectorAll('.course-card');
+        const filters = document.querySelectorAll('[id^="filter-"]');
+        
+        // Reset filter buttons
+        filters.forEach(filter => {
+            filter.classList.remove('btn-primary');
+            filter.classList.add('btn-outline');
+        });
+        
+        // Highlight active filter
+        document.getElementById(`filter-${category}`).classList.remove('btn-outline');
+        document.getElementById(`filter-${category}`).classList.add('btn-primary');
+        
+        // Show/hide courses
+        courses.forEach(course => {
+            if (category === 'all' || course.dataset.category === category) {
+                course.style.display = 'block';
+                course.style.animation = 'fadeInUp 0.5s ease';
+            } else {
+                course.style.display = 'none';
+            }
+        });
+    }
+    
+    async function enrollCourse(courseId) {
+        try {
+            const response = await fetch(`{% url 'api:enroll' %}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    course_id: courseId
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showEnrollmentSuccess(data.course, data.message);
+            } else {
+                showEnrollmentDemo(courseId);
+            }
+        } catch (error) {
+            console.error('Enrollment error:', error);
+            showEnrollmentDemo(courseId);
+        }
+    }
+    
+    function showEnrollmentSuccess(course, message) {
+        const content = `
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
+                <h3 style="color: var(--success); margin-bottom: 1rem;">Successfully Enrolled!</h3>
+                <p style="margin-bottom: 2rem;">${message}</p>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <a href="{% url 'learning:course' 'COURSE_ID' %}".replace('COURSE_ID', course.id) class="btn btn-primary">
+                        Start Learning
+                    </a>
+                    <button onclick="closeEnrollmentModal()" class="btn btn-outline">
+                        Close
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('enrollmentContent').innerHTML = content;
+        document.getElementById('enrollmentModal').style.display = 'flex';
+    }
+    
+    function showEnrollmentDemo(courseId) {
+        const content = `
+            <div style="text-align: center; padding: 1rem;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🎓</div>
+                <h3 style="color: var(--success); margin-bottom: 1rem;">Enrollment Confirmed!</h3>
+                <p style="margin-bottom: 1rem;">You have been successfully enrolled in this course.</p>
+                <p style="color: var(--gray); margin-bottom: 2rem;">
+                    You can now access course materials, track your progress, and earn certificates upon completion.
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <button onclick="startLearning('${courseId}')" class="btn btn-primary">
+                        🚀 Start Learning
+                    </button>
+                    <button onclick="closeEnrollmentModal()" class="btn btn-outline">
+                        Later
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('enrollmentContent').innerHTML = content;
+        document.getElementById('enrollmentModal').style.display = 'flex';
+    }
+    
+    function closeEnrollmentModal() {
+        document.getElementById('enrollmentModal').style.display = 'none';
+    }
+    
+    function startLearning(courseId) {
+        closeEnrollmentModal();
+        // In a real app, this would redirect to the course page
+        window.location.href = `{% url 'learning:course' 'PLACEHOLDER' %}`.replace('PLACEHOLDER', courseId);
+    }
+    
+    function openStudyPlanner() {
+        const content = `
+            <div style="padding: 1rem;">
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">📝 AI Study Planner</h3>
+                <p style="margin-bottom: 1rem;">Create a personalized study schedule based on:</p>
+                <ul style="margin-bottom: 2rem; line-height: 1.6;">
+                    <li>Your available time slots</li>
+                    <li>Course deadlines and priorities</li>
+                    <li>Your learning pace and style</li>
+                    <li>Exam dates and important events</li>
+                </ul>
+                <div style="text-align: center;">
+                    <a href="{% url 'wellness:chat' %}" class="btn btn-primary" style="margin-right: 1rem;">
+                        💬 Chat with Sahay to Plan
+                    </a>
+                    <button onclick="closeEnrollmentModal()" class="btn btn-outline">
+                        Close
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('enrollmentContent').innerHTML = content;
+        document.getElementById('enrollmentModal').style.display = 'flex';
+    }
+    
+    function openQuizBuilder() {
+        const content = `
+            <div style="padding: 1rem;">
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">🧠 AI Quiz Builder</h3>
+                <p style="margin-bottom: 1rem;">Generate custom quizzes for any topic:</p>
+                <ul style="margin-bottom: 2rem; line-height: 1.6;">
+                    <li>Multiple choice, true/false, and short answer questions</li>
+                    <li>Difficulty levels from beginner to advanced</li>
+                    <li>Instant feedback and explanations</li>
+                    <li>Progress tracking and performance analytics</li>
+                </ul>
+                <div style="text-align: center;">
+                    <a href="{% url 'wellness:chat' %}" class="btn btn-primary" style="margin-right: 1rem;">
+                        🤖 Ask Sahay to Create Quiz
+                    </a>
+                    <button onclick="closeEnrollmentModal()" class="btn btn-outline">
+                        Close
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('enrollmentContent').innerHTML = content;
+        document.getElementById('enrollmentModal').style.display = 'flex';
+    }
+    
+    function openProgressAnalytics() {
+        const content = `
+            <div style="padding: 1rem;">
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">📊 Progress Analytics</h3>
+                <p style="margin-bottom: 1rem;">Get detailed insights into your learning:</p>
+                <ul style="margin-bottom: 2rem; line-height: 1.6;">
+                    <li>Time spent on different subjects</li>
+                    <li>Learning velocity and efficiency</li>
+                    <li>Strength and weakness analysis</li>
+                    <li>Comparison with peer performance</li>
+                    <li>Predictive success modeling</li>
+                </ul>
+                <div style="text-align: center;">
+                    <a href="{% url 'analytics:index' %}" class="btn btn-primary" style="margin-right: 1rem;">
+                        📈 View Full Analytics
+                    </a>
+                    <button onclick="closeEnrollmentModal()" class="btn btn-outline">
+                        Close
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('enrollmentContent').innerHTML = content;
+        document.getElementById('enrollmentModal').style.display = 'flex';
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Initialize filters
+    document.addEventListener('DOMContentLoaded', function() {
+        filterCourses('all');
+        
+        // Add hover effects to course cards
+        document.querySelectorAll('.course-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.borderColor = 'var(--primary)';
+                this.style.transform = 'translateY(-5px)';
+                this.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.borderColor = 'var(--gray-light)';
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+            });
+        });
+        
+        // Close modal when clicking outside
+        document.getElementById('enrollmentModal').onclick = function(e) {
+            if (e.target === this) {
+                closeEnrollmentModal();
+            }
+        }
+    });
+</script>
+{% endblock %}

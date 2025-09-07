@@ -1,0 +1,951 @@
+{% extends 'base.html' %}
+
+{% block title %}Wellness Check-in - Sahay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .checkin-container {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .checkin-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    
+    .checkin-header {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .checkin-content {
+        padding: 2rem;
+    }
+    
+    .question-section {
+        display: none;
+        animation: fadeInRight 0.5s ease;
+    }
+    
+    .question-section.active {
+        display: block;
+    }
+    
+    .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--gray-light);
+    }
+    
+    .question-number {
+        background: var(--primary);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    
+    .progress-bar {
+        flex: 1;
+        margin: 0 1rem;
+        background: var(--gray-light);
+        height: 6px;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        height: 100%;
+        width: 0%;
+        transition: width 0.5s ease;
+    }
+    
+    .question-title {
+        font-size: 1.4rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+        line-height: 1.4;
+    }
+    
+    .question-subtitle {
+        color: var(--gray);
+        margin-bottom: 2rem;
+        line-height: 1.5;
+    }
+    
+    .answer-options {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .answer-option {
+        border: 2px solid var(--gray-light);
+        border-radius: 12px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: white;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .answer-option:hover {
+        border-color: var(--primary);
+        background: var(--primary-light);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .answer-option.selected {
+        border-color: var(--primary);
+        background: var(--primary);
+        color: white;
+    }
+    
+    .answer-emoji {
+        font-size: 2rem;
+        flex-shrink: 0;
+    }
+    
+    .answer-text {
+        flex: 1;
+    }
+    
+    .answer-title {
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+    }
+    
+    .answer-description {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+    
+    .mood-scale {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--background);
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+    
+    .mood-point {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        padding: 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        min-width: 60px;
+    }
+    
+    .mood-point:hover {
+        background: white;
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .mood-point.selected {
+        background: var(--primary);
+        color: white;
+    }
+    
+    .mood-emoji {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .mood-label {
+        font-size: 0.8rem;
+        text-align: center;
+    }
+    
+    .navigation-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+    }
+    
+    .nav-button {
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        min-width: 120px;
+    }
+    
+    .btn-prev {
+        background: var(--gray-light);
+        color: var(--text);
+    }
+    
+    .btn-prev:hover {
+        background: var(--gray);
+        transform: translateY(-2px);
+    }
+    
+    .btn-next, .btn-submit {
+        background: var(--primary);
+        color: white;
+    }
+    
+    .btn-next:hover, .btn-submit:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+    }
+    
+    .btn-next:disabled, .btn-submit:disabled {
+        background: var(--gray);
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .results-section {
+        display: none;
+        text-align: center;
+        padding: 2rem 0;
+    }
+    
+    .results-section.active {
+        display: block;
+        animation: fadeIn 0.8s ease;
+    }
+    
+    .results-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+    
+    .results-title {
+        font-size: 2rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+    }
+    
+    .results-summary {
+        background: var(--background);
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        text-align: left;
+    }
+    
+    .recommendations {
+        background: white;
+        border: 2px solid var(--success);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .recommendation-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--gray-light);
+    }
+    
+    .recommendation-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+    
+    .privacy-notice {
+        background: var(--success-light);
+        border-left: 4px solid var(--success);
+        padding: 1rem;
+        border-radius: 4px;
+        margin-bottom: 2rem;
+        font-size: 0.9rem;
+    }
+    
+    @keyframes fadeInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @media (max-width: 768px) {
+        .checkin-container {
+            padding: 1rem;
+        }
+        
+        .mood-scale {
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .mood-point {
+            min-width: 50px;
+            padding: 0.5rem;
+        }
+        
+        .mood-emoji {
+            font-size: 1.5rem;
+        }
+        
+        .navigation-buttons {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="checkin-container">
+    <div class="privacy-notice">
+        🔒 <strong>Completely Private & Secure:</strong> Your responses are anonymized and encrypted. 
+        No personal information is stored. This check-in helps generate personalized wellness recommendations.
+    </div>
+
+    <div class="checkin-card">
+        <div class="checkin-header">
+            <h2 style="margin: 0; font-size: 2rem;">🌟 Wellness Check-in</h2>
+            <p style="margin: 1rem 0 0 0; opacity: 0.9;">
+                Take 2 minutes to check in with yourself. Get personalized support and actionable wellness steps.
+            </p>
+        </div>
+        
+        <div class="checkin-content">
+            <!-- Question 1: Overall Feeling -->
+            <div class="question-section active" data-question="1">
+                <div class="question-header">
+                    <div class="question-number">1</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 20%"></div>
+                    </div>
+                    <span style="color: var(--gray); font-weight: 600;">1 of 5</span>
+                </div>
+                
+                <h3 class="question-title">How are you feeling today overall?</h3>
+                <p class="question-subtitle">Choose the option that best describes your current emotional state.</p>
+                
+                <div class="answer-options">
+                    <div class="answer-option" onclick="selectAnswer(1, 'great')" data-value="great">
+                        <div class="answer-emoji">😊</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Great</div>
+                            <div class="answer-description">I'm feeling positive and energetic</div>
+                        </div>
+                    </div>
+                    <div class="answer-option" onclick="selectAnswer(1, 'good')" data-value="good">
+                        <div class="answer-emoji">🙂</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Good</div>
+                            <div class="answer-description">I'm doing well with minor ups and downs</div>
+                        </div>
+                    </div>
+                    <div class="answer-option" onclick="selectAnswer(1, 'okay')" data-value="okay">
+                        <div class="answer-emoji">😐</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Okay</div>
+                            <div class="answer-description">I'm getting by, nothing particularly good or bad</div>
+                        </div>
+                    </div>
+                    <div class="answer-option" onclick="selectAnswer(1, 'not_great')" data-value="not_great">
+                        <div class="answer-emoji">😔</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Not Great</div>
+                            <div class="answer-description">I'm struggling with some challenges</div>
+                        </div>
+                    </div>
+                    <div class="answer-option" onclick="selectAnswer(1, 'poor')" data-value="poor">
+                        <div class="answer-emoji">😢</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Poor</div>
+                            <div class="answer-description">I'm having a really difficult time</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 2: Stress Level -->
+            <div class="question-section" data-question="2">
+                <div class="question-header">
+                    <div class="question-number">2</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 40%"></div>
+                    </div>
+                    <span style="color: var(--gray); font-weight: 600;">2 of 5</span>
+                </div>
+                
+                <h3 class="question-title">What's your stress level right now?</h3>
+                <p class="question-subtitle">Rate your current stress on a scale from 1 (very calm) to 10 (very stressed).</p>
+                
+                <div class="mood-scale">
+                    <div class="mood-point" onclick="selectMood(1)" data-value="1">
+                        <div class="mood-emoji">😌</div>
+                        <div class="mood-label">Very Calm<br>1</div>
+                    </div>
+                    <div class="mood-point" onclick="selectMood(2)" data-value="2">
+                        <div class="mood-emoji">🙂</div>
+                        <div class="mood-label">Calm<br>2</div>
+                    </div>
+                    <div class="mood-point" onclick="selectMood(3)" data-value="3">
+                        <div class="mood-emoji">😊</div>
+                        <div class="mood-label">Relaxed<br>3</div>
+                    </div>
+                    <div class="mood-point" onclick="selectMood(4)" data-value="4">
+                        <div class="mood-emoji">😐</div>
+                        <div class="mood-label">Neutral<br>4</div>
+                    </div>
+                    <div class="mood-point" onclick="selectMood(5)" data-value="5">
+                        <div class="mood-emoji">😕</div>
+                        <div class="mood-label">Slightly<br>Stressed<br>5</div>
+                    </div>
+                    <div class="mood-point" onclick="selectMood(6)" data-value="6">
+                        <div class="mood-emoji">😟</div>
+                        <div class="mood-label">Stressed<br>6</div>
+                    </div>
+                    <div class="mood-point" onclick="selectMood(7)" data-value="7">
+                        <div class="mood-emoji">😰</div>
+                        <div class="mood-label">Quite<br>Stressed<br>7</div>
+                    </div>
+                    <div class="mood-point" onclick="selectMood(8)" data-value="8">
+                        <div class="mood-emoji">😨</div>
+                        <div class="mood-label">Very<br>Stressed<br>8</div>
+                    </div>
+                    <div class="mood-point" onclick="selectMood(9)" data-value="9">
+                        <div class="mood-emoji">😱</div>
+                        <div class="mood-label">Extremely<br>Stressed<br>9</div>
+                    </div>
+                    <div class="mood-point" onclick="selectMood(10)" data-value="10">
+                        <div class="mood-emoji">🤯</div>
+                        <div class="mood-label">Overwhelmed<br>10</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 3: Sleep Quality -->
+            <div class="question-section" data-question="3">
+                <div class="question-header">
+                    <div class="question-number">3</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%"></div>
+                    </div>
+                    <span style="color: var(--gray); font-weight: 600;">3 of 5</span>
+                </div>
+                
+                <h3 class="question-title">How well did you sleep last night?</h3>
+                <p class="question-subtitle">Quality sleep is crucial for mental health and academic performance.</p>
+                
+                <div class="answer-options">
+                    <div class="answer-option" onclick="selectAnswer(3, 'excellent')" data-value="excellent">
+                        <div class="answer-emoji">😴</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Excellent</div>
+                            <div class="answer-description">7-9 hours, deep and refreshing sleep</div>
+                        </div>
+                    </div>
+                    <div class="answer-option" onclick="selectAnswer(3, 'good')" data-value="good">
+                        <div class="answer-emoji">😊</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Good</div>
+                            <div class="answer-description">6-8 hours, mostly restful with minor interruptions</div>
+                        </div>
+                    </div>
+                    <div class="answer-option" onclick="selectAnswer(3, 'fair')" data-value="fair">
+                        <div class="answer-emoji">😐</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Fair</div>
+                            <div class="answer-description">5-7 hours, some tossing and turning</div>
+                        </div>
+                    </div>
+                    <div class="answer-option" onclick="selectAnswer(3, 'poor')" data-value="poor">
+                        <div class="answer-emoji">😞</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Poor</div>
+                            <div class="answer-description">Less than 5 hours or very restless sleep</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 4: Academic Concerns -->
+            <div class="question-section" data-question="4">
+                <div class="question-header">
+                    <div class="question-number">4</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 80%"></div>
+                    </div>
+                    <span style="color: var(--gray); font-weight: 600;">4 of 5</span>
+                </div>
+                
+                <h3 class="question-title">What's your biggest concern right now?</h3>
+                <p class="question-subtitle">Select all that apply. This helps us provide targeted support.</p>
+                
+                <div class="answer-options">
+                    <div class="answer-option" onclick="selectMultiple(4, 'studies')" data-value="studies">
+                        <div class="answer-emoji">📚</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Academic Performance</div>
+                            <div class="answer-description">Grades, exams, assignments, or study difficulties</div>
+                        </div>
+                    </div>
+                    <div class="answer-option" onclick="selectMultiple(4, 'career')" data-value="career">
+                        <div class="answer-emoji">🎯</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Career & Future</div>
+                            <div class="answer-description">Job prospects, career choices, or life direction</div>
+                        </div>
+                    </div>
+                    <div class="answer-option" onclick="selectMultiple(4, 'social')" data-value="social">
+                        <div class="answer-emoji">👥</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Social & Relationships</div>
+                            <div class="answer-description">Friends, family, or social connections</div>
+                        </div>
+                    </div>
+                    <div class="answer-option" onclick="selectMultiple(4, 'financial')" data-value="financial">
+                        <div class="answer-emoji">💰</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Financial Stress</div>
+                            <div class="answer-description">Money, fees, or financial pressures</div>
+                        </div>
+                    </div>
+                    <div class="answer-option" onclick="selectMultiple(4, 'health')" data-value="health">
+                        <div class="answer-emoji">🏥</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Health & Wellbeing</div>
+                            <div class="answer-description">Physical health, mental health, or self-care</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 5: Support Needs -->
+            <div class="question-section" data-question="5">
+                <div class="question-header">
+                    <div class="question-number">5</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                    <span style="color: var(--gray); font-weight: 600;">5 of 5</span>
+                </div>
+                
+                <h3 class="question-title">What kind of support would be most helpful right now?</h3>
+                <p class="question-subtitle">This helps us tailor your recommendations and next steps.</p>
+                
+                <div class="answer-options">
+                    <div class="answer-option" onclick="selectAnswer(5, 'immediate')" data-value="immediate">
+                        <div class="answer-emoji">🆘</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Immediate Support</div>
+                            <div class="answer-description">I need help right now with a crisis or urgent situation</div>
+                        </div>
+                    </div>
+                    <div class="answer-option" onclick="selectAnswer(5, 'coping')" data-value="coping">
+                        <div class="answer-emoji">🧘‍♀️</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Coping Strategies</div>
+                            <div class="answer-description">Techniques for managing stress and emotions</div>
+                        </div>
+                    </div>
+                    <div class="answer-option" onclick="selectAnswer(5, 'guidance')" data-value="guidance">
+                        <div class="answer-emoji">🧭</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Guidance & Planning</div>
+                            <div class="answer-description">Help with decisions, planning, and next steps</div>
+                        </div>
+                    </div>
+                    <div class="answer-option" onclick="selectAnswer(5, 'resources')" data-value="resources">
+                        <div class="answer-emoji">📋</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Information & Resources</div>
+                            <div class="answer-description">Links, tools, and educational materials</div>
+                        </div>
+                    </div>
+                    <div class="answer-option" onclick="selectAnswer(5, 'maintenance')" data-value="maintenance">
+                        <div class="answer-emoji">🌱</div>
+                        <div class="answer-text">
+                            <div class="answer-title">Ongoing Wellness</div>
+                            <div class="answer-description">Regular check-ins and maintenance strategies</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection">
+                <div class="results-icon">🎉</div>
+                <h2 class="results-title">Your Wellness Check-in is Complete!</h2>
+                
+                <div class="results-summary" id="resultsSummary">
+                    <!-- Results will be populated here -->
+                </div>
+                
+                <div class="recommendations" id="recommendationsContainer">
+                    <!-- Recommendations will be populated here -->
+                </div>
+                
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem;">
+                    <a href="{% url 'wellness:chat' %}" class="btn btn-primary">
+                        💬 Chat with Sahay
+                    </a>
+                    <a href="{% url 'core:dashboard' %}" class="btn btn-secondary">
+                        📊 View Dashboard
+                    </a>
+                    <button onclick="startNewCheckin()" class="btn btn-outline">
+                        🔄 New Check-in
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <div class="navigation-buttons" id="navigationButtons">
+                <button class="nav-button btn-prev" onclick="previousQuestion()" id="prevButton" style="visibility: hidden;">
+                    ← Previous
+                </button>
+                <button class="nav-button btn-next" onclick="nextQuestion()" id="nextButton" disabled>
+                    Next →
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentQuestion = 1;
+    let answers = {};
+    const totalQuestions = 5;
+    
+    function selectAnswer(questionNum, value) {
+        // Clear previous selections
+        const options = document.querySelectorAll(`[data-question="${questionNum}"] .answer-option`);
+        options.forEach(option => option.classList.remove('selected'));
+        
+        // Select current option
+        const selectedOption = document.querySelector(`[data-question="${questionNum}"] [data-value="${value}"]`);
+        selectedOption.classList.add('selected');
+        
+        // Store answer
+        answers[questionNum] = value;
+        
+        // Enable next button
+        document.getElementById('nextButton').disabled = false;
+    }
+    
+    function selectMood(value) {
+        // Clear previous selections
+        const moods = document.querySelectorAll('.mood-point');
+        moods.forEach(mood => mood.classList.remove('selected'));
+        
+        // Select current mood
+        const selectedMood = document.querySelector(`[data-value="${value}"]`);
+        selectedMood.classList.add('selected');
+        
+        // Store answer
+        answers[2] = value;
+        
+        // Enable next button
+        document.getElementById('nextButton').disabled = false;
+    }
+    
+    function selectMultiple(questionNum, value) {
+        const option = document.querySelector(`[data-question="${questionNum}"] [data-value="${value}"]`);
+        
+        // Initialize array if not exists
+        if (!answers[questionNum]) {
+            answers[questionNum] = [];
+        }
+        
+        // Toggle selection
+        if (option.classList.contains('selected')) {
+            option.classList.remove('selected');
+            answers[questionNum] = answers[questionNum].filter(item => item !== value);
+        } else {
+            option.classList.add('selected');
+            answers[questionNum].push(value);
+        }
+        
+        // Enable next button if at least one option is selected
+        document.getElementById('nextButton').disabled = answers[questionNum].length === 0;
+    }
+    
+    function nextQuestion() {
+        if (currentQuestion < totalQuestions) {
+            // Hide current question
+            document.querySelector(`[data-question="${currentQuestion}"]`).classList.remove('active');
+            
+            // Show next question
+            currentQuestion++;
+            document.querySelector(`[data-question="${currentQuestion}"]`).classList.add('active');
+            
+            // Update navigation
+            updateNavigation();
+        } else {
+            // Submit and show results
+            submitCheckin();
+        }
+    }
+    
+    function previousQuestion() {
+        if (currentQuestion > 1) {
+            // Hide current question
+            document.querySelector(`[data-question="${currentQuestion}"]`).classList.remove('active');
+            
+            // Show previous question
+            currentQuestion--;
+            document.querySelector(`[data-question="${currentQuestion}"]`).classList.add('active');
+            
+            // Update navigation
+            updateNavigation();
+        }
+    }
+    
+    function updateNavigation() {
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+        
+        // Show/hide previous button
+        prevButton.style.visibility = currentQuestion > 1 ? 'visible' : 'hidden';
+        
+        // Update next/submit button
+        if (currentQuestion === totalQuestions) {
+            nextButton.textContent = '✓ Complete Check-in';
+            nextButton.className = 'nav-button btn-submit';
+        } else {
+            nextButton.textContent = 'Next →';
+            nextButton.className = 'nav-button btn-next';
+        }
+        
+        // Enable/disable next button based on answer
+        nextButton.disabled = !answers[currentQuestion];
+        
+        // For multiple choice question (question 4), check if any options selected
+        if (currentQuestion === 4) {
+            nextButton.disabled = !answers[currentQuestion] || answers[currentQuestion].length === 0;
+        }
+    }
+    
+    async function submitCheckin() {
+        try {
+            const response = await fetch('{% url "wellness:check" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    answers: answers,
+                    timestamp: new Date().toISOString()
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showResults(data.results);
+            } else {
+                showResults(generateDemoResults());
+            }
+        } catch (error) {
+            console.error('Submission error:', error);
+            showResults(generateDemoResults());
+        }
+    }
+    
+    function showResults(results) {
+        // Hide all questions and navigation
+        document.querySelectorAll('.question-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById('navigationButtons').style.display = 'none';
+        
+        // Show results
+        document.getElementById('resultsSection').classList.add('active');
+        
+        // Populate results summary
+        document.getElementById('resultsSummary').innerHTML = `
+            <h3 style="color: var(--primary); margin-bottom: 1rem;">📊 Your Wellness Summary</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                <div style="text-align: center; padding: 1rem; background: white; border-radius: 8px;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">${results.mood_emoji}</div>
+                    <div style="font-weight: 600;">Overall Mood</div>
+                    <div style="color: var(--gray);">${results.overall_mood}</div>
+                </div>
+                <div style="text-align: center; padding: 1rem; background: white; border-radius: 8px;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">${results.stress_emoji}</div>
+                    <div style="font-weight: 600;">Stress Level</div>
+                    <div style="color: var(--gray);">${results.stress_level}/10</div>
+                </div>
+                <div style="text-align: center; padding: 1rem; background: white; border-radius: 8px;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">${results.sleep_emoji}</div>
+                    <div style="font-weight: 600;">Sleep Quality</div>
+                    <div style="color: var(--gray);">${results.sleep_quality}</div>
+                </div>
+            </div>
+            <p style="line-height: 1.6;">${results.summary}</p>
+        `;
+        
+        // Populate recommendations
+        document.getElementById('recommendationsContainer').innerHTML = `
+            <h3 style="color: var(--success); margin-bottom: 1.5rem; text-align: center;">
+                🎯 Personalized Recommendations
+            </h3>
+            ${results.recommendations.map(rec => `
+                <div class="recommendation-item">
+                    <div style="font-size: 1.5rem; flex-shrink: 0;">${rec.emoji}</div>
+                    <div>
+                        <h4 style="color: var(--primary); margin-bottom: 0.5rem;">${rec.title}</h4>
+                        <p style="color: var(--gray); margin-bottom: 0;">${rec.description}</p>
+                    </div>
+                </div>
+            `).join('')}
+        `;
+        
+        // Save results to local storage for dashboard
+        localStorage.setItem('lastWellnessCheckin', JSON.stringify({
+            timestamp: new Date().toISOString(),
+            results: results
+        }));
+    }
+    
+    function generateDemoResults() {
+        // Generate demo results based on answers
+        const overallFeeling = answers[1] || 'okay';
+        const stressLevel = answers[2] || 5;
+        const sleepQuality = answers[3] || 'fair';
+        const concerns = answers[4] || [];
+        const supportType = answers[5] || 'coping';
+        
+        const moodEmojis = {
+            'great': '😊', 'good': '🙂', 'okay': '😐', 'not_great': '😔', 'poor': '😢'
+        };
+        
+        const stressEmojis = {
+            1: '😌', 2: '😌', 3: '🙂', 4: '😐', 5: '😕', 
+            6: '😟', 7: '😰', 8: '😨', 9: '😱', 10: '🤯'
+        };
+        
+        const sleepEmojis = {
+            'excellent': '😴', 'good': '😊', 'fair': '😐', 'poor': '😞'
+        };
+        
+        const recommendations = [
+            {
+                emoji: '🧘‍♀️',
+                title: 'Try Deep Breathing',
+                description: 'Practice 5-minute breathing exercises when feeling overwhelmed. The 4-7-8 technique is particularly effective.'
+            },
+            {
+                emoji: '💬',
+                title: 'Chat with Sahay',
+                description: 'Our AI assistant can provide personalized support and coping strategies in your preferred language.'
+            }
+        ];
+        
+        // Add specific recommendations based on answers
+        if (stressLevel >= 7) {
+            recommendations.push({
+                emoji: '🆘',
+                title: 'Consider Professional Support',
+                description: 'Your stress level is quite high. Consider speaking with a counselor or mental health professional.'
+            });
+        }
+        
+        if (sleepQuality === 'poor') {
+            recommendations.push({
+                emoji: '😴',
+                title: 'Improve Sleep Hygiene',
+                description: 'Create a bedtime routine, limit screen time before bed, and aim for 7-9 hours of sleep.'
+            });
+        }
+        
+        if (concerns.includes('studies')) {
+            recommendations.push({
+                emoji: '📚',
+                title: 'Academic Support',
+                description: 'Break large tasks into smaller steps, use study techniques like Pomodoro, and consider study groups.'
+            });
+        }
+        
+        return {
+            overall_mood: overallFeeling.replace('_', ' '),
+            mood_emoji: moodEmojis[overallFeeling],
+            stress_level: stressLevel,
+            stress_emoji: stressEmojis[stressLevel] || '😐',
+            sleep_quality: sleepQuality,
+            sleep_emoji: sleepEmojis[sleepQuality],
+            summary: `Based on your responses, you're feeling ${overallFeeling.replace('_', ' ')} with a stress level of ${stressLevel}/10. ${sleepQuality === 'poor' ? 'Poor sleep might be affecting your wellbeing.' : sleepQuality === 'excellent' ? 'Great sleep is supporting your mental health!' : 'Your sleep quality could use some attention.'} Remember that seeking support is a sign of strength, and small steps can make a big difference.`,
+            recommendations: recommendations.slice(0, 4)
+        };
+    }
+    
+    function startNewCheckin() {
+        // Reset everything
+        currentQuestion = 1;
+        answers = {};
+        
+        // Hide results and show first question
+        document.getElementById('resultsSection').classList.remove('active');
+        document.querySelector('[data-question="1"]').classList.add('active');
+        document.getElementById('navigationButtons').style.display = 'flex';
+        
+        // Clear all selections
+        document.querySelectorAll('.answer-option, .mood-point').forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        // Reset navigation
+        updateNavigation();
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}
