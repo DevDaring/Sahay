@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sahay - Multi-Language AI Student Wellness Platform{% endblock %}</title>
+    
+    <!-- CSS -->
+    <style>
+        :root {
+            --primary: #6B5B95;
+            --secondary: #88D8B0;
+            --accent: #FFCC5C;
+            --background: #F7F9FC;
+            --text: #2C3E50;
+            --success: #27AE60;
+            --warning: #F39C12;
+            --error: #E74C3C;
+            --white: #FFFFFF;
+            --gray-light: #ECF0F1;
+            --gray: #95A5A6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Navigation */
+        nav {
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        nav .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #8B7BB5);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(107, 91, 149, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Grid System */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+        
+        .grid-4 {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+	
+	
+	
+	
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<div id="locationBanner" class="location-banner" style="display: block;">
+        <div class="container">
+            <div class="location-status">
+                <i class="fas fa-map-marker-alt"></i>
+                <span id="locationText">Requesting location permission to provide personalized content...</span>
+                <button id="enableLocationBtn" class="btn btn-light btn-sm ms-auto">
+                    <i class="fas fa-location-dot"></i> Enable Location
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Navigation -->
+    <nav>
+        <div class="container nav-container">
+            <a href="/" class="logo">🌟 Sahay</a>
+            <ul class="nav-links">
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="/wellness/checkin/">Check-in</a></li>
+                    <li><a href="/wellness/chat/">Chat</a></li>
+                    <li><a href="/learning/career/">Career</a></li>
+                    <li><a href="/analytics/patterns/">Insights</a></li>
+                    <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li><a href="{% url 'logout' %}" style="color: var(--error);">Logout ({{ user.first_name|default:user.username }})</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer style="margin-top: 4rem; padding: 2rem 0; background: var(--white); text-align: center;">
+        <div class="container">
+            <p style="color: var(--gray);">© 2024 Sahay - Privacy-First Wellness Platform</p>
+        </div>
+    </footer>
+	<!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+	<!-- Location and Trending Topics Script -->
+    <script>
+        // Location and trending topics functionality
+        class LocationTrendingService {
+            constructor() {
+                this.userLocation = null;
+                this.trendingTopics = [];
+                this.locationEnabled = false;
+                
+                this.init();
+            }
+            
+            init() {
+                this.checkLocationPermission();
+                this.setupEventListeners();
+            }
+            
+            setupEventListeners() {
+                const enableBtn = document.getElementById('enableLocationBtn');
+                if (enableBtn) {
+                    enableBtn.addEventListener('click', () => this.requestLocation());
+                }
+            }
+            
+            checkLocationPermission() {
+                console.log('Checking location permission...');
+                
+                if (!navigator.geolocation) {
+                    console.log('Geolocation not supported');
+                    this.showFallbackMessage();
+                    return;
+                }
+                
+                console.log('Geolocation is supported');
+                
+                // Always show the location banner on page load to let user choose
+                this.showLocationBanner();
+                
+                // Check if location permission was previously granted
+                if (navigator.permissions) {
+                    navigator.permissions.query({name: 'geolocation'}).then((permission) => {
+                        console.log('Permission state:', permission.state);
+                        if (permission.state === 'granted') {
+                            console.log('Permission already granted, getting location...');
+                            this.getCurrentLocation();
+                        } else if (permission.state === 'prompt') {
+                            console.log('Permission needs to be requested');
+                            // Banner is already shown
+                        } else {
+                            console.log('Permission denied');
+                            // Still show banner with option to retry
+                        }
+                    }).catch((error) => {
+                        console.log('Permissions API error:', error);
+                        // Fallback - show banner anyway
+                    });
+                } else {
+                    console.log('Permissions API not supported, showing banner');
+                    // Browser doesn't support permissions API, show banner anyway
+                }
+            }
+            
+            showLocationBanner() {
+                console.log('Showing location banner...');
+                const banner = document.getElementById('locationBanner');
+                if (banner) {
+                    banner.style.display = 'block';
+                    console.log('Location banner displayed');
+                } else {
+                    console.log('Location banner element not found!');
+                }
+            }
+            
+            requestLocation() {
+                const locationText = document.getElementById('locationText');
+                const enableBtn = document.getElementById('enableLocationBtn');
+                
+                if (locationText) locationText.textContent = 'Getting your location...';
+                if (enableBtn) enableBtn.disabled = true;
+                
+                this.getCurrentLocation();
+            }
+            
+            getCurrentLocation() {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => this.onLocationSuccess(position),
+                    (error) => this.onLocationError(error),
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 60000
+                    }
+                );
+            }
+            
+            async onLocationSuccess(position) {
+                this.userLocation = {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    accuracy: position.coords.accuracy
+                };
+                
+                this.locationEnabled = true;
+                
+                // Update UI
+                const banner = document.getElementById('locationBanner');
+                const locationText = document.getElementById('locationText');
+                
+                if (locationText) {
+                    locationText.innerHTML = '<i class="fas fa-check text-success"></i> Location detected! Loading trending topics...';
+                }
+                
+                // Store location in session
+                await this.storeLocationInSession();
+                
+                // Hide banner after success
+                setTimeout(() => {
+                    if (banner) banner.style.display = 'none';
+                }, 2000);
+            }
+            
+            onLocationError(error) {
+                console.warn('Location error:', error);
+                console.log('Error code:', error.code, 'Error message:', error.message);
+                
+                const locationText = document.getElementById('locationText');
+                const enableBtn = document.getElementById('enableLocationBtn');
+                
+                let errorMessage = 'Unable to get location. ';
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage += 'Permission denied by user.';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage += 'Location information unavailable.';
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage += 'Location request timed out.';
+                        break;
+                    default:
+                        errorMessage += 'Unknown error occurred.';
+                        break;
+                }
+                
+                if (locationText) {
+                    locationText.innerHTML = `<i class="fas fa-exclamation-triangle text-warning"></i> ${errorMessage} Using fallback mode.`;
+                }
+                
+                if (enableBtn) {
+                    enableBtn.disabled = false;
+                    enableBtn.textContent = 'Retry Location';
+                }
+                
+                // Use fallback after a delay
+                setTimeout(() => this.showFallbackMessage(), 3000);
+            }
+            
+            async storeLocationInSession() {
+                try {
+                    const response = await fetch('/api/store-location/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': this.getCSRFToken()
+                        },
+                        body: JSON.stringify(this.userLocation)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to store location');
+                    }
+                    
+                    console.log('Location stored in session');
+                } catch (error) {
+                    console.warn('Failed to store location:', error);
+                }
+            }
+            
+            
+            async initializeDynamicChat() {
+                try {
+                    const response = await fetch('/api/init-chat/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': this.getCSRFToken()
+                        },
+                        body: JSON.stringify({
+                            location: this.userLocation,
+                            trending_topics: this.trendingTopics
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    this.displayInitialMessage(data.message);
+                    
+                } catch (error) {
+                    console.warn('Failed to initialize dynamic chat:', error);
+                    this.showFallbackMessage();
+                }
+            }
+            
+            displayInitialMessage(message) {
+                const chatInterface = document.getElementById('chatInterface');
+                if (chatInterface) {
+                    chatInterface.innerHTML = `
+                        <div class="alert alert-info">
+                            <h5><i class="fas fa-robot"></i> Sahay</h5>
+                            <p>${message}</p>
+                            <div class="mt-3">
+                                <button class="btn btn-success me-2" onclick="respondToTopic('interested')">
+                                    <i class="fas fa-thumbs-up"></i> Interested
+                                </button>
+                                <button class="btn btn-secondary" onclick="respondToTopic('not_interested')">
+                                    <i class="fas fa-thumbs-down"></i> Not Interested
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            showFallbackMessage() {
+                const chatInterface = document.getElementById('chatInterface');
+                const banner = document.getElementById('locationBanner');
+                
+                if (banner) banner.style.display = 'none';
+                
+                if (chatInterface) {
+                    chatInterface.innerHTML = `
+                        <div class="alert alert-primary">
+                            <h5><i class="fas fa-robot"></i> Sahay</h5>
+                            <p>Hello! I'm Sahay, your AI wellness companion. I'm here to support your mental health and well-being through personalized conversations and guidance.</p>
+                            <p>How are you feeling today?</p>
+                            <div class="mt-3">
+                                <button class="btn btn-primary" onclick="startChat()">
+                                    <i class="fas fa-comments"></i> Start Chatting
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            getCSRFToken() {
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    const [name, value] = cookie.trim().split('=');
+                    if (name === 'csrftoken') {
+                        return value;
+                    }
+                }
+                return '';
+            }
+        }
+        
+        // Global functions for button interactions
+        async function respondToTopic(response) {
+            try {
+                const result = await fetch('/api/topic-interest/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': locationService.getCSRFToken()
+                    },
+                    body: JSON.stringify({
+                        response: response,
+                        topics: locationService.trendingTopics
+                    })
+                });
+                
+                const data = await result.json();
+                
+                // Redirect to main chat interface
+                window.location.href = '/wellness/chat/';
+                
+            } catch (error) {
+                console.error('Failed to record topic interest:', error);
+                startChat();
+            }
+        }
+        
+        function startChat() {
+            window.location.href = '/wellness/chat/';
+        }
+        
+        // Initialize location service when page loads
+        let locationService;
+        document.addEventListener('DOMContentLoaded', () => {
+            locationService = new LocationTrendingService();
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+
+

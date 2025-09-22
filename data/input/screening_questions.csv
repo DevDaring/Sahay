@@ -1,0 +1,23 @@
+question_id,screener_type,question_text,scoring_rules,order
+GAD_1,GAD-2,"Over the last 2 weeks, how often have you been bothered by feeling nervous, anxious, or on edge?","{""0"": ""Not at all"", ""1"": ""Several days"", ""2"": ""More than half the days"", ""3"": ""Nearly every day""}",1
+GAD_2,GAD-2,"Over the last 2 weeks, how often have you been bothered by not being able to stop or control worrying?","{""0"": ""Not at all"", ""1"": ""Several days"", ""2"": ""More than half the days"", ""3"": ""Nearly every day""}",2
+GAD7_1,GAD-7,"Feeling nervous, anxious, or on edge","{""0"": ""Not at all"", ""1"": ""Several days"", ""2"": ""More than half the days"", ""3"": ""Nearly every day""}",1
+GAD7_2,GAD-7,"Not being able to stop or control worrying","{""0"": ""Not at all"", ""1"": ""Several days"", ""2"": ""More than half the days"", ""3"": ""Nearly every day""}",2
+GAD7_3,GAD-7,"Worrying too much about different things","{""0"": ""Not at all"", ""1"": ""Several days"", ""2"": ""More than half the days"", ""3"": ""Nearly every day""}",3
+GAD7_4,GAD-7,"Trouble relaxing","{""0"": ""Not at all"", ""1"": ""Several days"", ""2"": ""More than half the days"", ""3"": ""Nearly every day""}",4
+GAD7_5,GAD-7,"Being so restless that it is hard to sit still","{""0"": ""Not at all"", ""1"": ""Several days"", ""2"": ""More than half the days"", ""3"": ""Nearly every day""}",5
+GAD7_6,GAD-7,"Becoming easily annoyed or irritable","{""0"": ""Not at all"", ""1"": ""Several days"", ""2"": ""More than half the days"", ""3"": ""Nearly every day""}",6
+GAD7_7,GAD-7,"Feeling afraid as if something awful might happen","{""0"": ""Not at all"", ""1"": ""Several days"", ""2"": ""More than half the days"", ""3"": ""Nearly every day""}",7
+PHQ_1,PHQ-2,"Over the last 2 weeks, how often have you been bothered by little interest or pleasure in doing things?","{""0"": ""Not at all"", ""1"": ""Several days"", ""2"": ""More than half the days"", ""3"": ""Nearly every day""}",1
+PHQ_2,PHQ-2,"Over the last 2 weeks, how often have you been bothered by feeling down, depressed, or hopeless?","{""0"": ""Not at all"", ""1"": ""Several days"", ""2"": ""More than half the days"", ""3"": ""Nearly every day""}",2
+PHQ9_1,PHQ-9,"Little interest or pleasure in doing things","{""0"": ""Not at all"", ""1"": ""Several days"", ""2"": ""More than half the days"", ""3"": ""Nearly every day""}",1
+PHQ9_2,PHQ-9,"Feeling down, depressed, or hopeless","{""0"": ""Not at all"", ""1"": ""Several days"", ""2"": ""More than half the days"", ""3"": ""Nearly every day""}",2
+PHQ9_3,PHQ-9,"Trouble falling or staying asleep, or sleeping too much","{""0"": ""Not at all"", ""1"": ""Several days"", ""2"": ""More than half the days"", ""3"": ""Nearly every day""}",3
+PHQ9_4,PHQ-9,"Feeling tired or having little energy","{""0"": ""Not at all"", ""1"": ""Several days"", ""2"": ""More than half the days"", ""3"": ""Nearly every day""}",4
+PHQ9_5,PHQ-9,"Poor appetite or overeating","{""0"": ""Not at all"", ""1"": ""Several days"", ""2"": ""More than half the days"", ""3"": ""Nearly every day""}",5
+PTSD_1,PC-PTSD-5,"Sometimes things happen to people that are unusually or especially frightening, horrible, or traumatic. Have you ever experienced this kind of event?","{""0"": ""No"", ""1"": ""Yes""}",1
+PTSD_2,PC-PTSD-5,"In the past month, have you had nightmares about the event(s) or thought about the event(s) when you did not want to?","{""0"": ""No"", ""1"": ""Yes""}",2
+PTSD_3,PC-PTSD-5,"In the past month, have you tried hard not to think about the event(s) or went out of your way to avoid situations that reminded you of the event(s)?","{""0"": ""No"", ""1"": ""Yes""}",3
+AUDIT_1,AUDIT-C,"How often do you have a drink containing alcohol?","{""0"": ""Never"", ""1"": ""Monthly or less"", ""2"": ""2-4 times a month"", ""3"": ""2-3 times a week"", ""4"": ""4 or more times a week""}",1
+AUDIT_2,AUDIT-C,"How many standard drinks containing alcohol do you have on a typical day when drinking?","{""0"": ""1 or 2"", ""1"": ""3 or 4"", ""2"": ""5 or 6"", ""3"": ""7 to 9"", ""4"": ""10 or more""}",2
+AUDIT_3,AUDIT-C,"How often do you have six or more drinks on one occasion?","{""0"": ""Never"", ""1"": ""Less than monthly"", ""2"": ""Monthly"", ""3"": ""Weekly"", ""4"": ""Daily or almost daily""}",3

@@ -1,0 +1,16 @@
+# Essential Django application files
+analytics/
+api/
+core/
+data/
+frontend/
+learning/
+logs/
+sahay/
+services/
+tests/
+wellness/
+manage.py
+requirements.txt
+.env
+db.sqlite3

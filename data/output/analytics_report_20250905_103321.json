@@ -1,0 +1,24 @@
+{
+  "report_date": "2025-09-05T10:33:21.370910",
+  "time_window_days": 7,
+  "class_id": null,
+  "total_students": 40,
+  "active_students": 0,
+  "wellness_metrics": {
+    "avg_mood_score": 0,
+    "avg_anxiety_score": 0,
+    "risk_distribution": {},
+    "total_sessions": 0,
+    "high_risk_percentage": 0
+  },
+  "learning_metrics": {
+    "avg_quiz_score": 0,
+    "avg_duration": 0,
+    "comprehension_distribution": {},
+    "total_sessions": 0
+  },
+  "patterns": [],
+  "recommendations": [
+    "Review teaching methods - low quiz scores across sessions"
+  ]
+}

@@ -1,0 +1,21 @@
+mentor_id,name,expertise,languages,availability,rating,sessions_completed,response_time_hours,is_active
+SAH001,Dr. Priya Sharma,"[""computer_science"", ""programming"", ""career_guidance""]","[""English"", ""Hindi""]",Morning,4.8,45,12,true
+SAH002,Raj Patel,"[""mathematics"", ""physics"", ""research""]","[""English"", ""Hindi"", ""Bengali""]",Afternoon,4.6,32,8,true
+SAH003,Anita Das,"[""mental_health"", ""counseling"", ""wellness""]","[""English"", ""Bengali""]",Evening,4.9,67,6,true
+SAH004,Vikram Singh,"[""business"", ""entrepreneurship"", ""startup""]","[""English"", ""Hindi""]",Flexible,4.7,28,4,true
+SAH005,Sneha Gupta,"[""psychology"", ""therapy"", ""stress_management""]","[""English"", ""Hindi""]",Morning,4.9,89,10,true
+SAH006,Arjun Kumar,"[""web_development"", ""javascript"", ""react""]","[""English"", ""Hindi"", ""Bengali""]",Afternoon,4.5,23,16,true
+SAH007,Meera Reddy,"[""data_science"", ""machine_learning"", ""python""]","[""English"", ""Hindi""]",Evening,4.8,41,8,true
+SAH008,Rohit Joshi,"[""cybersecurity"", ""ethical_hacking"", ""privacy""]","[""English"", ""Hindi""]",Flexible,4.6,35,12,true
+SAH009,Kavya Nair,"[""arts"", ""creative_writing"", ""literature""]","[""English"", ""Hindi"", ""Bengali""]",Morning,4.7,52,14,true
+SAH010,Amit Ghosh,"[""economics"", ""finance"", ""statistics""]","[""English"", ""Bengali""]",Afternoon,4.5,19,18,true
+SAH011,Pooja Agarwal,"[""biology"", ""biotechnology"", ""research""]","[""English"", ""Hindi""]",Evening,4.8,38,10,true
+SAH012,Karan Mehta,"[""mechanical_engineering"", ""robotics"", ""automation""]","[""English"", ""Hindi""]",Flexible,4.6,27,20,true
+SAH013,Ritika Shah,"[""design"", ""ui_ux"", ""graphic_design""]","[""English"", ""Hindi"", ""Bengali""]",Morning,4.9,44,6,true
+SAH014,Sanjay Mishra,"[""chemistry"", ""lab_research"", ""pharmaceuticals""]","[""English"", ""Hindi""]",Afternoon,4.4,15,24,true
+SAH015,Deepika Rao,"[""journalism"", ""media"", ""communication""]","[""English"", ""Hindi"", ""Bengali""]",Evening,4.7,33,12,true
+SAH016,Nikhil Verma,"[""civil_engineering"", ""construction"", ""project_management""]","[""English"", ""Hindi""]",Flexible,4.5,21,16,true
+SAH017,Shweta Pandey,"[""education"", ""teaching"", ""curriculum_design""]","[""English"", ""Hindi"", ""Bengali""]",Morning,4.8,56,8,true
+SAH018,Ravi Tripathi,"[""agriculture"", ""farming"", ""sustainability""]","[""English"", ""Hindi""]",Afternoon,4.6,29,14,true
+SAH019,Nisha Jain,"[""law"", ""legal_advice"", ""human_rights""]","[""English"", ""Hindi"", ""Bengali""]",Evening,4.9,47,10,true
+SAH020,Manish Chandra,"[""music"", ""composition"", ""performance""]","[""English"", ""Hindi"", ""Bengali""]",Flexible,4.7,36,12,true

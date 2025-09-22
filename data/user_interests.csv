@@ -1,0 +1,7 @@
+Id,UserId,Topic,Interest,Location,Country,Timestamp,Source
+1,1,Mental Health Awareness,interested,Kolkata India,IN,2025-09-21T13:45:00Z,trending
+2,1,Technology Innovation,interested,Kolkata India,IN,2025-09-21T13:45:00Z,trending
+3,1,Climate Change Action,not_interested,Kolkata India,IN,2025-09-21T13:45:00Z,trending
+4,1,Mental Health Awareness,interested,"Bengal, IND",US,2025-09-21T13:47:36.609121,trending
+5,1,Technology Innovation,interested,"Bengal, IND",US,2025-09-21T13:47:36.622837,trending
+6,1,Climate Change Action,not_interested,"Bengal, IND",US,2025-09-21T13:47:36.629175,trending

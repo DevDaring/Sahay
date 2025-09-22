@@ -1,0 +1,814 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics Dashboard - Sahay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .analytics-header {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .metric-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .metric-label {
+        color: var(--gray);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .metric-change {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: 15px;
+    }
+    
+    .change-positive {
+        background: var(--success-light);
+        color: var(--success-dark);
+    }
+    
+    .change-negative {
+        background: var(--error-light);
+        color: var(--error-dark);
+    }
+    
+    .change-neutral {
+        background: var(--gray-light);
+        color: var(--gray);
+    }
+    
+    .chart-container {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .chart-placeholder {
+        height: 300px;
+        background: var(--background);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        border: 2px dashed var(--gray-light);
+    }
+    
+    .insight-card {
+        background: white;
+        border-left: 4px solid var(--primary);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .insight-icon {
+        font-size: 1.5rem;
+        margin-right: 0.5rem;
+    }
+    
+    .insight-title {
+        color: var(--primary);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .insight-description {
+        color: var(--gray);
+        line-height: 1.5;
+    }
+    
+    .filter-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+    
+    .filter-tab {
+        padding: 0.8rem 1.5rem;
+        border: 2px solid var(--gray-light);
+        border-radius: 25px;
+        background: white;
+        color: var(--text);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    
+    .filter-tab.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+    
+    .filter-tab:hover:not(.active) {
+        border-color: var(--primary);
+        transform: translateY(-2px);
+    }
+    
+    .progress-bar {
+        background: var(--gray-light);
+        border-radius: 10px;
+        height: 8px;
+        overflow: hidden;
+        margin: 0.5rem 0;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.5s ease;
+    }
+    
+    .progress-wellness { background: linear-gradient(90deg, var(--success), var(--accent)); }
+    .progress-learning { background: linear-gradient(90deg, var(--primary), var(--secondary)); }
+    .progress-career { background: linear-gradient(90deg, var(--secondary), var(--accent)); }
+    
+    .heatmap-container {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 3px;
+        margin-bottom: 1rem;
+    }
+    
+    .heatmap-cell {
+        width: 100%;
+        height: 30px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        color: white;
+        font-weight: 500;
+    }
+    
+    .activity-low { background: var(--gray-light); color: var(--gray); }
+    .activity-medium { background: var(--accent); }
+    .activity-high { background: var(--success); }
+    .activity-very-high { background: var(--primary); }
+    
+    .export-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin: 2rem 0;
+        flex-wrap: wrap;
+    }
+    
+    @media (max-width: 768px) {
+        .analytics-header {
+            padding: 1.5rem;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+        }
+        
+        .chart-placeholder {
+            height: 250px;
+        }
+        
+        .filter-tabs {
+            justify-content: center;
+        }
+        
+        .heatmap-container {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 0;">
+    <!-- Header -->
+    <div class="analytics-header">
+        <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">📊 Analytics Dashboard</h1>
+        <p style="font-size: 1.1rem; opacity: 0.9;">
+            Insights into your wellness journey, learning progress, and personal growth
+        </p>
+    </div>
+    
+    <!-- Time Filter Tabs -->
+    <div class="filter-tabs">
+        <button class="filter-tab active" onclick="setTimeFilter('7d')" id="filter-7d">Last 7 Days</button>
+        <button class="filter-tab" onclick="setTimeFilter('30d')" id="filter-30d">Last 30 Days</button>
+        <button class="filter-tab" onclick="setTimeFilter('90d')" id="filter-90d">Last 3 Months</button>
+        <button class="filter-tab" onclick="setTimeFilter('1y')" id="filter-1y">Last Year</button>
+        <button class="filter-tab" onclick="setTimeFilter('all')" id="filter-all">All Time</button>
+    </div>
+    
+    <!-- Key Metrics -->
+    <div class="grid grid-4" style="margin-bottom: 3rem;">
+        <div class="metric-card">
+            <div class="metric-icon">🧘‍♀️</div>
+            <div class="metric-value" style="color: var(--success);" id="wellness-score">{{ wellness_score }}</div>
+            <div class="metric-label">Wellness Score</div>
+            <div class="metric-change change-positive" id="wellness-change">+{{ wellness_change }}% this week</div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-icon">📚</div>
+            <div class="metric-value" style="color: var(--primary);" id="learning-hours">{{ learning_hours }}</div>
+            <div class="metric-label">Learning Hours</div>
+            <div class="metric-change change-positive" id="learning-change">+{{ learning_change }}h this week</div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-icon">🎯</div>
+            <div class="metric-value" style="color: var(--secondary);" id="goals-completed">{{ goals_completed }}</div>
+            <div class="metric-label">Goals Completed</div>
+            <div class="metric-change change-positive" id="goals-change">{{ goals_streak }} day streak</div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-icon">📈</div>
+            <div class="metric-value" style="color: var(--accent);" id="growth-rate">{{ growth_rate }}%</div>
+            <div class="metric-label">Growth Rate</div>
+            <div class="metric-change change-positive" id="growth-change">Above average</div>
+        </div>
+    </div>
+    
+    <!-- Charts Row -->
+    <div class="grid grid-2" style="margin-bottom: 3rem;">
+        <!-- Wellness Trend Chart -->
+        <div class="chart-container">
+            <h3 style="color: var(--primary); margin-bottom: 1.5rem;">
+                🌱 Wellness Trend Over Time
+            </h3>
+            <div class="chart-placeholder" id="wellness-chart">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📈</div>
+                <p style="color: var(--gray); text-align: center;">
+                    Interactive wellness trend chart<br>
+                    <span style="font-size: 0.9rem;">Mood, stress levels, and check-in frequency</span>
+                </p>
+            </div>
+        </div>
+        
+        <!-- Learning Progress Chart -->
+        <div class="chart-container">
+            <h3 style="color: var(--secondary); margin-bottom: 1.5rem;">
+                📊 Learning Progress Breakdown
+            </h3>
+            <div class="chart-placeholder" id="learning-chart">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🎓</div>
+                <p style="color: var(--gray); text-align: center;">
+                    Course completion and skill development<br>
+                    <span style="font-size: 0.9rem;">Time spent by subject and progress</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Activity Heatmap -->
+    <div class="chart-container" style="margin-bottom: 3rem;">
+        <h3 style="color: var(--accent); margin-bottom: 1.5rem;">
+            🔥 Activity Heatmap - Last 28 Days
+        </h3>
+        <div style="margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <span style="font-size: 0.9rem; color: var(--gray);">Less Active</span>
+                <div style="display: flex; gap: 3px;">
+                    <div class="activity-low" style="width: 12px; height: 12px; border-radius: 2px;"></div>
+                    <div class="activity-medium" style="width: 12px; height: 12px; border-radius: 2px;"></div>
+                    <div class="activity-high" style="width: 12px; height: 12px; border-radius: 2px;"></div>
+                    <div class="activity-very-high" style="width: 12px; height: 12px; border-radius: 2px;"></div>
+                </div>
+                <span style="font-size: 0.9rem; color: var(--gray);">More Active</span>
+            </div>
+            <div class="heatmap-container" id="activity-heatmap">
+                <!-- Heatmap cells will be generated by JavaScript -->
+            </div>
+            <div style="text-align: center; margin-top: 1rem;">
+                <p style="color: var(--gray); font-size: 0.9rem;">
+                    Daily activity based on wellness check-ins, learning sessions, and chat interactions
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Progress Summary -->
+    <div class="grid grid-3" style="margin-bottom: 3rem;">
+        <div class="card">
+            <h4 style="color: var(--success); margin-bottom: 1rem;">
+                🧘‍♀️ Wellness Journey
+            </h4>
+            <div style="margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Mental Health</span>
+                    <span>{{ mental_health_score }}/10</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill progress-wellness" style="width: {{ mental_health_score }}0%"></div>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Stress Management</span>
+                    <span>{{ stress_management }}/10</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill progress-wellness" style="width: {{ stress_management }}0%"></div>
+                </div>
+            </div>
+            
+            <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Self-Care</span>
+                    <span>{{ self_care }}/10</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill progress-wellness" style="width: {{ self_care }}0%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h4 style="color: var(--primary); margin-bottom: 1rem;">
+                📚 Learning Progress
+            </h4>
+            <div style="margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Course Completion</span>
+                    <span>{{ course_completion }}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill progress-learning" style="width: {{ course_completion }}%"></div>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Skill Development</span>
+                    <span>{{ skill_development }}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill progress-learning" style="width: {{ skill_development }}%"></div>
+                </div>
+            </div>
+            
+            <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Knowledge Retention</span>
+                    <span>{{ knowledge_retention }}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill progress-learning" style="width: {{ knowledge_retention }}%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h4 style="color: var(--secondary); margin-bottom: 1rem;">
+                🎯 Career Development
+            </h4>
+            <div style="margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Goal Achievement</span>
+                    <span>{{ goal_achievement }}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill progress-career" style="width: {{ goal_achievement }}%"></div>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Skill Relevance</span>
+                    <span>{{ skill_relevance }}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill progress-career" style="width: {{ skill_relevance }}%"></div>
+                </div>
+            </div>
+            
+            <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>Market Readiness</span>
+                    <span>{{ market_readiness }}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill progress-career" style="width: {{ market_readiness }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI-Generated Insights -->
+    <div class="card" style="margin-bottom: 3rem;">
+        <h3 style="color: var(--accent); margin-bottom: 2rem; text-align: center;">
+            🤖 AI-Generated Insights & Recommendations
+        </h3>
+        
+        <div id="insights-container">
+            {% for insight in ai_insights %}
+            <div class="insight-card" style="border-left-color: {{ insight.color }};">
+                <div style="display: flex; align-items: flex-start;">
+                    <span class="insight-icon">{{ insight.icon }}</span>
+                    <div style="flex: 1;">
+                        <div class="insight-title">{{ insight.title }}</div>
+                        <div class="insight-description">{{ insight.description }}</div>
+                        {% if insight.action %}
+                        <div style="margin-top: 1rem;">
+                            <a href="{{ insight.action_url }}" class="btn btn-outline" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                {{ insight.action }}
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <!-- Demo insights -->
+            <div class="insight-card">
+                <div style="display: flex; align-items: flex-start;">
+                    <span class="insight-icon">🎯</span>
+                    <div style="flex: 1;">
+                        <div class="insight-title">Strong Learning Momentum</div>
+                        <div class="insight-description">You've maintained consistent learning habits for the past 2 weeks. Your completion rate has improved by 25%. Consider tackling more challenging topics to accelerate growth.</div>
+                        <div style="margin-top: 1rem;">
+                            <a href="{% url 'learning:index' %}" class="btn btn-outline" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                🚀 Explore Advanced Courses
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="insight-card" style="border-left-color: var(--success);">
+                <div style="display: flex; align-items: flex-start;">
+                    <span class="insight-icon">🧘‍♀️</span>
+                    <div style="flex: 1;">
+                        <div class="insight-title">Wellness Pattern Detected</div>
+                        <div class="insight-description">Your stress levels tend to spike on Mondays and Thursdays. Consider scheduling mindfulness sessions before these days to maintain balance.</div>
+                        <div style="margin-top: 1rem;">
+                            <a href="{% url 'wellness:index' %}" class="btn btn-outline" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                🌸 Try Wellness Exercises
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="insight-card" style="border-left-color: var(--accent);">
+                <div style="display: flex; align-items: flex-start;">
+                    <span class="insight-icon">📈</span>
+                    <div style="flex: 1;">
+                        <div class="insight-title">Career Readiness Score</div>
+                        <div class="insight-description">Based on current skill development pace, you'll be ready for your target role in approximately 4-6 months. Focus on portfolio projects to strengthen your profile.</div>
+                        <div style="margin-top: 1rem;">
+                            <a href="{% url 'learning:career' %}" class="btn btn-outline" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                🎯 Update Career Plan
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Export and Actions -->
+    <div class="export-actions">
+        <button onclick="generateReport()" class="btn btn-primary">
+            📋 Generate Full Report
+        </button>
+        <button onclick="exportData()" class="btn btn-secondary">
+            📊 Export Data
+        </button>
+        <button onclick="shareProgress()" class="btn btn-outline">
+            🔗 Share Progress
+        </button>
+        <a href="{% url 'wellness:chat' %}" class="btn btn-outline">
+            💬 Discuss with Sahay AI
+        </a>
+    </div>
+</div>
+
+<!-- Report Modal -->
+<div id="reportModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="card" style="max-width: 600px; margin: 2rem; max-height: 80vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="color: var(--primary);">📋 Progress Report</h3>
+            <button onclick="closeReportModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+        </div>
+        <div id="reportContent"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentFilter = '7d';
+    
+    function setTimeFilter(filter) {
+        currentFilter = filter;
+        
+        // Update tab appearance
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.getElementById(`filter-${filter}`).classList.add('active');
+        
+        // Update data (in real app, this would fetch new data)
+        updateDashboardData(filter);
+        generateActivityHeatmap();
+    }
+    
+    function updateDashboardData(filter) {
+        // In a real app, this would fetch data from API based on the filter
+        // For demo, we'll just update some values
+        const demoData = {
+            '7d': { wellness: 8.5, learning: 12, goals: 5, growth: 15 },
+            '30d': { wellness: 8.2, learning: 45, goals: 18, growth: 22 },
+            '90d': { wellness: 7.8, learning: 120, goals: 48, growth: 35 },
+            '1y': { wellness: 7.5, learning: 480, goals: 185, growth: 45 },
+            'all': { wellness: 8.0, learning: 650, goals: 220, growth: 50 }
+        };
+        
+        const data = demoData[filter] || demoData['7d'];
+        
+        // Update metric cards with animation
+        animateCounter('wellness-score', data.wellness);
+        animateCounter('learning-hours', data.learning);
+        animateCounter('goals-completed', data.goals);
+        animateCounter('growth-rate', data.growth);
+        
+        // Update charts (placeholder for now)
+        updateChartPlaceholders(filter);
+    }
+    
+    function animateCounter(elementId, targetValue) {
+        const element = document.getElementById(elementId);
+        const startValue = parseFloat(element.textContent) || 0;
+        const duration = 1000;
+        const startTime = performance.now();
+        
+        function updateCounter(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            const currentValue = startValue + (targetValue - startValue) * progress;
+            element.textContent = elementId === 'wellness-score' ? currentValue.toFixed(1) : Math.round(currentValue);
+            
+            if (progress < 1) {
+                requestAnimationFrame(updateCounter);
+            }
+        }
+        
+        requestAnimationFrame(updateCounter);
+    }
+    
+    function updateChartPlaceholders(filter) {
+        const periods = {
+            '7d': 'Last 7 days',
+            '30d': 'Last 30 days', 
+            '90d': 'Last 3 months',
+            '1y': 'Last year',
+            'all': 'All time'
+        };
+        
+        document.querySelector('#wellness-chart p').innerHTML = `
+            Interactive wellness trend chart<br>
+            <span style="font-size: 0.9rem;">Data for ${periods[filter]}</span>
+        `;
+        
+        document.querySelector('#learning-chart p').innerHTML = `
+            Course completion and skill development<br>
+            <span style="font-size: 0.9rem;">Progress for ${periods[filter]}</span>
+        `;
+    }
+    
+    function generateActivityHeatmap() {
+        const container = document.getElementById('activity-heatmap');
+        container.innerHTML = '';
+        
+        // Generate 28 days of demo activity data
+        for (let i = 27; i >= 0; i--) {
+            const activity = Math.random();
+            let className = 'activity-low';
+            
+            if (activity > 0.75) className = 'activity-very-high';
+            else if (activity > 0.5) className = 'activity-high';
+            else if (activity > 0.25) className = 'activity-medium';
+            
+            const cell = document.createElement('div');
+            cell.className = `heatmap-cell ${className}`;
+            cell.title = `${i} days ago - ${Math.round(activity * 100)}% activity`;
+            
+            // Add some interactivity
+            cell.addEventListener('mouseenter', function() {
+                this.style.opacity = '0.7';
+                this.style.cursor = 'pointer';
+            });
+            
+            cell.addEventListener('mouseleave', function() {
+                this.style.opacity = '1';
+            });
+            
+            container.appendChild(cell);
+        }
+    }
+    
+    function generateReport() {
+        const reportContent = `
+            <div style="padding: 1rem;">
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">📊 Comprehensive Progress Report</h3>
+                
+                <div style="background: var(--background); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <h4 style="margin-bottom: 1rem;">Executive Summary</h4>
+                    <p style="line-height: 1.6;">
+                        Over the selected period, you've demonstrated strong commitment to personal growth and learning. 
+                        Your wellness score has improved by 15%, learning hours have increased by 40%, and you've 
+                        maintained a consistent goal achievement rate.
+                    </p>
+                </div>
+                
+                <div style="background: var(--background); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <h4 style="margin-bottom: 1rem;">Key Achievements</h4>
+                    <ul style="line-height: 1.8;">
+                        <li>Completed 5 wellness check-ins with consistent mood tracking</li>
+                        <li>Finished 2 courses with 85% average completion rate</li>
+                        <li>Maintained 7-day learning streak</li>
+                        <li>Achieved 80% of weekly wellness goals</li>
+                        <li>Improved stress management score by 25%</li>
+                    </ul>
+                </div>
+                
+                <div style="background: var(--background); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <h4 style="margin-bottom: 1rem;">Recommendations</h4>
+                    <ul style="line-height: 1.8;">
+                        <li>Continue current learning pace to maintain momentum</li>
+                        <li>Schedule regular wellness check-ins for better tracking</li>
+                        <li>Consider advanced courses in areas of strength</li>
+                        <li>Join community discussions for peer support</li>
+                    </ul>
+                </div>
+                
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button onclick="downloadReport()" class="btn btn-primary" style="margin-right: 1rem;">
+                        💾 Download PDF
+                    </button>
+                    <button onclick="emailReport()" class="btn btn-secondary">
+                        📧 Email Report
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('reportContent').innerHTML = reportContent;
+        document.getElementById('reportModal').style.display = 'flex';
+    }
+    
+    function exportData() {
+        // In a real app, this would trigger a CSV/JSON download
+        const csvData = `Date,Wellness Score,Learning Hours,Goals Completed,Stress Level
+2024-01-01,8.5,2.5,3,4
+2024-01-02,8.2,3.0,2,3
+2024-01-03,8.8,1.5,4,2
+2024-01-04,7.9,2.0,3,5
+2024-01-05,8.1,3.5,2,3`;
+        
+        const blob = new Blob([csvData], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'sahay_analytics_data.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        // Show success message
+        showNotification('📊 Data exported successfully!', 'success');
+    }
+    
+    function shareProgress() {
+        if (navigator.share) {
+            navigator.share({
+                title: 'My Sahay Progress',
+                text: 'Check out my learning and wellness progress on Sahay!',
+                url: window.location.href
+            });
+        } else {
+            // Fallback: copy to clipboard
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                showNotification('🔗 Progress link copied to clipboard!', 'success');
+            });
+        }
+    }
+    
+    function downloadReport() {
+        // Simulate PDF download
+        showNotification('📋 Report download started!', 'success');
+        closeReportModal();
+    }
+    
+    function emailReport() {
+        // Simulate email functionality
+        showNotification('📧 Report sent to your email!', 'success');
+        closeReportModal();
+    }
+    
+    function closeReportModal() {
+        document.getElementById('reportModal').style.display = 'none';
+    }
+    
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? 'var(--success)' : 'var(--primary)'};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            z-index: 10000;
+            animation: slideInRight 0.3s ease;
+        `;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
+    }
+    
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        generateActivityHeatmap();
+        
+        // Add hover effects to metric cards
+        document.querySelectorAll('.metric-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+        });
+        
+        // Close modal when clicking outside
+        document.getElementById('reportModal').onclick = function(e) {
+            if (e.target === this) {
+                closeReportModal();
+            }
+        };
+        
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    });
+</script>
+{% endblock %}

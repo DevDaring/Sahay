@@ -1,0 +1,16 @@
+report_id,report_type,category,location_bucket,k_count,content_redacted,status,handler,resolution_notes,created_at
+REP001,report,infrastructure,Building_A_Floor_2,8,"WiFi connectivity issues in [REDACTED] classroom affecting online learning sessions",resolved,admin_tech,"Upgraded network equipment and added additional access points",2024-08-15T09:00:00Z
+REP002,suggest,academic,Building_B_Floor_1,6,"Suggestion for additional practice sessions for [REDACTED] subject due to complexity",pending,,"",2024-08-16T14:00:00Z
+REP003,report,safety,Building_C_Parking,12,"Poor lighting in [REDACTED] area creating safety concerns for evening students",reviewing,admin_safety,,2024-08-17T18:00:00Z
+REP004,suggest,wellness,Building_D_Floor_3,7,"Request for meditation/quiet spaces for stress relief during exam periods",resolved,admin_wellness,"Created designated quiet zones on each floor",2024-08-18T11:00:00Z
+REP005,report,infrastructure,Building_E_Lab,5,"Outdated computers in [REDACTED] lab causing delays in programming assignments",pending,,"",2024-08-19T10:00:00Z
+REP006,suggest,academic,Building_A_Floor_4,9,"Proposal for peer tutoring program to help struggling students in [REDACTED] courses",reviewing,admin_academic,,2024-08-20T13:00:00Z
+REP007,report,wellness,Building_B_Floor_2,11,"High stress levels observed among students during [REDACTED] examination period",resolved,admin_wellness,"Implemented stress management workshops and extended counseling hours",2024-08-21T15:00:00Z
+REP008,suggest,infrastructure,Building_C_Cafeteria,15,"Suggestion to extend cafeteria hours for students with late classes",pending,,"",2024-08-22T12:00:00Z
+REP009,report,academic,Building_D_Floor_1,6,"Difficulty accessing required textbooks for [REDACTED] course in library",reviewing,admin_library,"",2024-08-23T09:00:00Z
+REP010,suggest,social,Building_A_Common_Area,8,"Request for more group study spaces and collaborative areas",resolved,admin_facilities,"Converted two storage rooms into collaborative study spaces",2024-08-24T16:00:00Z
+REP011,report,safety,Building_E_Stairwell,10,"Broken handrail on [REDACTED] staircase poses safety risk",resolved,admin_maintenance,"Repaired handrail and conducted safety inspection of all staircases",2024-08-25T08:00:00Z
+REP012,suggest,wellness,Building_B_Floor_3,7,"Suggestion for mental health awareness week with guest speakers",reviewing,admin_wellness,,2024-08-26T14:00:00Z
+REP013,report,infrastructure,Building_C_Floor_2,9,"Air conditioning issues in [REDACTED] classroom affecting concentration",pending,,",2024-08-27T11:00:00Z
+REP014,suggest,academic,Building_A_Floor_1,12,"Proposal for industry mentorship program connecting students with professionals",reviewing,admin_career,,2024-08-28T10:00:00Z
+REP015,report,other,Building_D_Entrance,6,"Inadequate signage causing confusion for new students and visitors",resolved,admin_facilities,"Updated signage system with multilingual directions and campus maps",2024-08-29T13:00:00Z
